@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brahmastra Game Store</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#020617;color:white;overflow-x:hidden}
+.glass{background:rgba(255,255,255,.07);backdrop-filter:blur(10px)}
+.card3d{transition:.35s}
+.card3d:hover{transform:scale(1.05);box-shadow:0 20px 40px rgba(255,0,255,.4)}
+.up-track{display:flex;gap:16px;width:max-content;animation:scrollLeft 25s linear infinite}
+@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.up-card{min-width:260px;border:1px solid purple;border-radius:14px;overflow:hidden}
+.up-card img{width:100%;height:170px;object-fit:cover}
+.category-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 8px}
+.platform-btn{background:linear-gradient(to right,#8b5cf6,#ec4899);padding:8px 0;border-radius:999px;font-weight:bold;width:100%;font-size:clamp(10px,2.5vw,14px)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999}
+.no-scroll{overflow:hidden;height:100vh}
+.card-img{height:150px;object-fit:cover}
+</style>
+</head>
+<body>
+
+<h1 class="text-center py-5 text-4xl font-extrabold text-purple-400">
+ BRAHMASTRA GAME STORE
+</h1>
+
+<div class="text-center text-pink-400 font-bold text-xl mt-2">🔥 Upcoming Games</div>
+
+<div class="overflow-hidden border-y border-pink-500 py-4 bg-black mt-2">
+ <div id="upcomingTrack" class="up-track"></div>
+</div>
+
+<div class="category-grid my-5">
+ <button onclick="filterPlatform('Steam')" class="platform-btn">STEAM</button>
+ <button onclick="filterPlatform('Epic')" class="platform-btn">EPIC</button>
+ <button onclick="filterPlatform('Ubisoft')" class="platform-btn">UBISOFT</button>
+ <button onclick="filterPlatform('BattleNet')" class="platform-btn">BATTLE.NET</button>
+ <button onclick="filterPlatform('All')" class="platform-btn bg-gray-600">ALL</button>
+</div>
+
+<div class="px-3 pb-10">
+ <div id="gamesBox" class="grid grid-cols-3 md:grid-cols-4 gap-4 justify-items-center"></div>
+</div>
+
+<!-- MODAL -->
+<div id="gameModal" class="hidden modal" onclick="closeModal()">
+ <div class="glass w-[94%] sm:w-[85%] md:w-2/3 lg:w-1/2 p-5 rounded-xl" onclick="event.stopPropagation()">
+  <button onclick="closeModal()" class="float-right text-xl">❌</button>
+
+  <h2 id="mTitle" class="text-2xl text-purple-400"></h2>
+  <p id="mDesc" class="text-gray-300 my-2"></p>
+
+  <!-- Video on top -->
+  <iframe id="mVideo" class="w-full h-[220px] sm:h-[260px] md:h-[300px] rounded" allowfullscreen></iframe>
+
+  <!-- Buttons -->
+  <div class="mt-3 space-y-2">
+    <button onclick="toggleReq()" class="w-full bg-purple-600 py-2 rounded font-bold">
+      📋 System Requirements
+    </button>
+
+    <div id="reqBox" class="hidden glass p-3 rounded text-sm">
+      <p><b>Minimum:</b> i3 / 8GB RAM / GTX 750 / 40GB</p>
+      <p><b>Recommended:</b> i5 / 16GB RAM / GTX 1660 / 60GB</p>
+    </div>
+
+    <button onclick="goSupport()" class="w-full bg-blue-600 py-2 rounded font-bold">
+      📞 Customer Care
+    </button>
+
+    <button id="mOrder" class="w-full bg-green-500 py-2 rounded font-bold">
+      🛒 Order on WhatsApp
+    </button>
+  </div>
+ </div>
+</div>
+
+<script>
+const upcomingGames=[
+ {title:"GTA 6",img:"https://picsum.photos/600?1"},
+ {title:"Cyber War X",img:"https://picsum.photos/600?2"},
+ {title:"Racing Pro 2026",img:"https://picsum.photos/600?3"},
+ {title:"Zombie World",img:"https://picsum.photos/600?4"}
+];
+
+const games=[
+ {id:1,title:"Cyber Strike",price:2999,platform:"Steam",img:"https://picsum.photos/500?10",desc:"Cyber open world action.",video:"https://www.youtube.com/embed/8X2kIfS6fb8"},
+ {id:2,title:"Fantasy Quest",price:1999,platform:"Epic",img:"https://picsum.photos/500?11",desc:"Magic RPG adventure.",video:"https://www.youtube.com/embed/2Gg6Seob5Mg"},
+ {id:3,title:"Speed Racers",price:2499,platform:"Steam",img:"https://picsum.photos/500?12",desc:"High speed racing.",video:"https://www.youtube.com/embed/5eZKcXc0Pns"},
+ {id:4,title:"Battle Arena",price:0,platform:"Ubisoft",img:"https://picsum.photos/500?13",desc:"Free battle royale.",video:"https://www.youtube.com/embed/8zC7r9Kj0cE"},
+ {id:5,title:"War Zone",price:3499,platform:"BattleNet",img:"https://picsum.photos/500?14",desc:"War shooter.",video:"https://www.youtube.com/embed/0E44DClsX5Q"}
+];
+
+let currentPlatform="All";
+
+function renderUpcoming(){
+ const box=document.getElementById("upcomingTrack");
+ const loop=[...upcomingGames,...upcomingGames];
+ box.innerHTML=loop.map(g=>`
+  <div class="up-card glass">
+   <img src="${g.img}">
+   <div class="p-2 text-center text-pink-400 font-bold">${g.title}</div>
+  </div>`).join("");
+}
+
+function filterPlatform(p){currentPlatform=p;renderGames();}
+
+function renderGames(){
+ const list=currentPlatform==="All"?games:games.filter(g=>g.platform===currentPlatform);
+ gamesBox.innerHTML=list.map(g=>`
+  <div class="card3d glass w-full max-w-[220px] rounded-xl cursor-pointer p-2">
+   <img src="${g.img}" class="w-full card-img rounded">
+   <div class="p-2 text-center">
+    <h3 class="font-bold">${g.title}</h3>
+    <p class="text-green-400 mb-2">${g.price==0?"FREE":"₹"+g.price}</p>
+    <button onclick="openGame(${g.id})"
+     class="bg-gradient-to-r from-purple-500 to-pink-500 w-full py-1 rounded font-bold">
+      Buy Now
+    </button>
+   </div>
+  </div>
+ `).join("");
+}
+
+function openGame(id){
+ const g=games.find(x=>x.id===id);
+ document.body.classList.add("no-scroll");
+ gameModal.classList.remove("hidden");
+ mTitle.innerText=g.title;
+ mDesc.innerText=g.desc;
+ mVideo.src=g.video;
+ mOrder.onclick=()=>{
+  const msg=`Hi, mujhe ye game chahiye:\n${g.title}\n₹${g.price}`;
+  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg),"_blank");
+ };
+}
+
+function closeModal(){
+ gameModal.classList.add("hidden");
+ mVideo.src="";
+ document.body.classList.remove("no-scroll");
+}
+
+function toggleReq(){
+ document.getElementById("reqBox").classList.toggle("hidden");
+}
+
+function goSupport(){
+ window.open("https://wa.me/919313339081","_blank");
+}
+
+renderUpcoming();
+renderGames();
+</script>
+</body>
+</html>
+```

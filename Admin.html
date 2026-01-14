@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Brahmastra Admin Panel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white p-4">
+
+<h1 class="text-3xl font-bold text-purple-400 mb-4">Brahmastra Admin Panel</h1>
+
+<!-- ADD PRODUCT -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">➕ Add / Edit Product</h2>
+
+<input id="pTitle" placeholder="Title" class="w-full mb-2 p-2 bg-black border">
+<input id="pPrice" placeholder="Price" type="number" class="w-full mb-2 p-2 bg-black border">
+<input id="pImg" placeholder="Image URL (optional)" class="w-full mb-2 p-2 bg-black border">
+
+<!-- Gallery Upload -->
+<input type="file" id="imgFile" accept="image/*"
+ class="w-full mb-2 p-2 bg-black border"
+ onchange="loadFromGallery(event)">
+
+<img id="previewImg" class="w-full h-40 object-cover rounded hidden mb-2">
+
+<input id="pVideo" placeholder="YouTube Embed URL" class="w-full mb-2 p-2 bg-black border">
+<textarea id="pDesc" placeholder="Description" class="w-full mb-2 p-2 bg-black border"></textarea>
+
+<button onclick="saveProduct()" class="bg-green-600 px-4 py-2 rounded w-full">
+ Save Product
+</button>
+</div>
+
+<!-- DISCOUNT -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">💸 Discount Control</h2>
+<input id="discount" placeholder="Discount %" type="number" class="w-full mb-2 p-2 bg-black border">
+<button onclick="setDiscount()" class="bg-pink-600 px-4 py-2 rounded w-full">
+ Apply Discount
+</button>
+</div>
+
+<!-- COUPON -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">🎁 Festival Coupon</h2>
+<input id="couponCode" placeholder="Coupon Code" class="w-full mb-2 p-2 bg-black border">
+<input id="couponOff" placeholder="Off %" type="number" class="w-full mb-2 p-2 bg-black border">
+<button onclick="saveCoupon()" class="bg-blue-600 px-4 py-2 rounded w-full">
+ Save Coupon
+</button>
+</div>
+
+<!-- PRODUCT LIST -->
+<div class="bg-slate-900 p-4 rounded">
+<h2 class="font-bold text-xl mb-2">📦 Products</h2>
+<div id="list"></div>
+</div>
+
+<script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
+let discountValue = localStorage.getItem("discount") || 0;
+let coupon = JSON.parse(localStorage.getItem("coupon")) || null;
+
+/* Gallery Load */
+function loadFromGallery(e){
+ const file = e.target.files[0];
+ if(!file) return;
+ const reader = new FileReader();
+ reader.onload = function(){
+   previewImg.src = reader.result;
+   previewImg.classList.remove("hidden");
+   pImg.value = reader.result; // auto fill
+ };
+ reader.readAsDataURL(file);
+}
+
+/* Save Product */
+function saveProduct(){
+ let p={
+  id:Date.now(),
+  title:pTitle.value,
+  price:+pPrice.value,
+  img:pImg.value,
+  video:pVideo.value,
+  desc:pDesc.value
+ };
+ products.push(p);
+ localStorage.setItem("products",JSON.stringify(products));
+ clearForm();
+ render();
+}
+
+/* Render List */
+function render(){
+ list.innerHTML = products.map(p=>`
+  <div class="border border-purple-500 p-2 my-2 rounded">
+   <b>${p.title}</b> - ₹${p.price}<br>
+   <img src="${p.img}" class="w-24 h-16 object-cover mt-1 rounded">
+   <div class="mt-1">
+    <button onclick="del(${p.id})" class="bg-red-600 px-2 py-1 mt-1 rounded">Delete</button>
+   </div>
+  </div>
+ `).join("");
+}
+
+/* Delete */
+function del(id){
+ products = products.filter(x=>x.id!=id);
+ localStorage.setItem("products",JSON.stringify(products));
+ render();
+}
+
+/* Discount */
+function setDiscount(){
+ localStorage.setItem("discount",discount.value);
+ alert("Discount Applied!");
+}
+
+/* Coupon */
+function saveCoupon(){
+ let c={code:couponCode.value,off:couponOff.value};
+ localStorage.setItem("coupon",JSON.stringify(c));
+ alert("Coupon Saved!");
+}
+
+/* Clear Form */
+function clearForm(){
+ pTitle.value="";
+ pPrice.value="";
+ pImg.value="";
+ pVideo.value="";
+ pDesc.value="";
+ imgFile.value="";
+ previewImg.classList.add("hidden");
+}
+
+render();
+</script>
+</body>
+</html>
+```
