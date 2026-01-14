@@ -5,138 +5,223 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-950 text-white p-4">
+<body class="bg-slate-950 text-white p-4 pb-20">
 
-<h1 class="text-3xl font-bold text-purple-400 mb-4">Brahmastra Admin Panel</h1>
+<h1 class="text-3xl font-bold text-purple-400 mb-4 text-center">🛡️ Brahmastra Admin</h1>
 
-<!-- ADD PRODUCT -->
-<div class="bg-slate-900 p-4 rounded mb-4">
-<h2 class="font-bold text-xl mb-2">➕ Add / Edit Product</h2>
+<div class="bg-slate-900 p-4 rounded-xl border border-slate-800 mb-4 shadow-lg">
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="font-bold text-xl text-purple-300" id="formTitle">➕ Add New Product</h2>
+    <button onclick="resetForm()" id="cancelBtn" class="hidden text-xs bg-gray-700 px-2 py-1 rounded hover:bg-gray-600">Cancel Edit</button>
+  </div>
 
-<input id="pTitle" placeholder="Title" class="w-full mb-2 p-2 bg-black border">
-<input id="pPrice" placeholder="Price" type="number" class="w-full mb-2 p-2 bg-black border">
-<input id="pImg" placeholder="Image URL (optional)" class="w-full mb-2 p-2 bg-black border">
+  <input id="pTitle" placeholder="Game Title" class="w-full mb-3 p-3 bg-black border border-slate-700 rounded text-white focus:border-purple-500 outline-none">
+  
+  <div class="flex gap-2 mb-3">
+    <input id="pPrice" placeholder="Price (₹)" type="number" class="w-1/2 p-3 bg-black border border-slate-700 rounded text-white focus:border-purple-500 outline-none">
+    <input id="pImg" placeholder="Image URL" class="w-1/2 p-3 bg-black border border-slate-700 rounded text-white focus:border-purple-500 outline-none">
+  </div>
 
-<!-- Gallery Upload -->
-<input type="file" id="imgFile" accept="image/*"
- class="w-full mb-2 p-2 bg-black border"
- onchange="loadFromGallery(event)">
+  <p class="text-xs text-gray-400 mb-1">Or Upload from Gallery:</p>
+  <input type="file" id="imgFile" accept="image/*" class="w-full mb-3 p-2 bg-slate-800 rounded cursor-pointer" onchange="loadFromGallery(event)">
 
-<img id="previewImg" class="w-full h-40 object-cover rounded hidden mb-2">
+  <img id="previewImg" class="w-full h-40 object-cover rounded hidden mb-3 border border-purple-500/50">
 
-<input id="pVideo" placeholder="YouTube Embed URL" class="w-full mb-2 p-2 bg-black border">
-<textarea id="pDesc" placeholder="Description" class="w-full mb-2 p-2 bg-black border"></textarea>
+  <input id="pVideo" placeholder="YouTube Embed URL" class="w-full mb-3 p-3 bg-black border border-slate-700 rounded text-white focus:border-purple-500 outline-none">
+  <textarea id="pDesc" placeholder="Description" rows="3" class="w-full mb-3 p-3 bg-black border border-slate-700 rounded text-white focus:border-purple-500 outline-none"></textarea>
 
-<button onclick="saveProduct()" class="bg-green-600 px-4 py-2 rounded w-full">
- Save Product
-</button>
+  <button id="submitBtn" onclick="saveProduct()" class="bg-green-600 hover:bg-green-700 transition font-bold px-4 py-3 rounded w-full text-lg shadow-lg shadow-green-900/50">
+    ✅ Save Product
+  </button>
 </div>
 
-<!-- DISCOUNT -->
-<div class="bg-slate-900 p-4 rounded mb-4">
-<h2 class="font-bold text-xl mb-2">💸 Discount Control</h2>
-<input id="discount" placeholder="Discount %" type="number" class="w-full mb-2 p-2 bg-black border">
-<button onclick="setDiscount()" class="bg-pink-600 px-4 py-2 rounded w-full">
- Apply Discount
-</button>
+<div class="grid grid-cols-2 gap-4 mb-4">
+  <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+    <h2 class="font-bold text-lg mb-2 text-pink-400">💸 Global Discount</h2>
+    <input id="discount" placeholder="Example: 10" type="number" class="w-full mb-2 p-2 bg-black border border-slate-700 rounded">
+    <button onclick="setDiscount()" class="bg-pink-600 hover:bg-pink-700 w-full py-1 rounded font-bold text-sm">Apply %</button>
+  </div>
+
+  <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+    <h2 class="font-bold text-lg mb-2 text-blue-400">🎁 Coupon Code</h2>
+    <input id="couponCode" placeholder="Code (e.g. DIWALI)" class="w-full mb-2 p-2 bg-black border border-slate-700 rounded">
+    <input id="couponOff" placeholder="Off %" type="number" class="w-full mb-2 p-2 bg-black border border-slate-700 rounded">
+    <button onclick="saveCoupon()" class="bg-blue-600 hover:bg-blue-700 w-full py-1 rounded font-bold text-sm">Set Coupon</button>
+  </div>
 </div>
 
-<!-- COUPON -->
-<div class="bg-slate-900 p-4 rounded mb-4">
-<h2 class="font-bold text-xl mb-2">🎁 Festival Coupon</h2>
-<input id="couponCode" placeholder="Coupon Code" class="w-full mb-2 p-2 bg-black border">
-<input id="couponOff" placeholder="Off %" type="number" class="w-full mb-2 p-2 bg-black border">
-<button onclick="saveCoupon()" class="bg-blue-600 px-4 py-2 rounded w-full">
- Save Coupon
-</button>
-</div>
-
-<!-- PRODUCT LIST -->
-<div class="bg-slate-900 p-4 rounded">
-<h2 class="font-bold text-xl mb-2">📦 Products</h2>
-<div id="list"></div>
+<div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+  <h2 class="font-bold text-xl mb-4 flex items-center gap-2">
+    📦 All Products <span id="countBadge" class="bg-purple-600 text-xs px-2 py-1 rounded-full">0</span>
+  </h2>
+  <div id="list" class="space-y-3"></div>
 </div>
 
 <script>
 let products = JSON.parse(localStorage.getItem("products")) || [];
 let discountValue = localStorage.getItem("discount") || 0;
 let coupon = JSON.parse(localStorage.getItem("coupon")) || null;
+let editingId = null; // Track kar raha hai ki hum naya bana rahe hain ya edit kar rahe hain
 
 /* Gallery Load */
 function loadFromGallery(e){
- const file = e.target.files[0];
- if(!file) return;
- const reader = new FileReader();
- reader.onload = function(){
-   previewImg.src = reader.result;
-   previewImg.classList.remove("hidden");
-   pImg.value = reader.result; // auto fill
- };
- reader.readAsDataURL(file);
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){
+    previewImg.src = reader.result;
+    previewImg.classList.remove("hidden");
+    pImg.value = reader.result; 
+  };
+  reader.readAsDataURL(file);
 }
 
-/* Save Product */
+/* Save OR Update Product */
 function saveProduct(){
- let p={
-  id:Date.now(),
-  title:pTitle.value,
-  price:+pPrice.value,
-  img:pImg.value,
-  video:pVideo.value,
-  desc:pDesc.value
- };
- products.push(p);
- localStorage.setItem("products",JSON.stringify(products));
- clearForm();
- render();
+  if(!pTitle.value || !pPrice.value){
+    alert("Please enter Title and Price!");
+    return;
+  }
+
+  // UPDATE MODE
+  if(editingId != null){
+    const index = products.findIndex(p => p.id === editingId);
+    if(index > -1){
+      products[index].title = pTitle.value;
+      products[index].price = +pPrice.value;
+      products[index].img = pImg.value;
+      products[index].video = pVideo.value;
+      products[index].desc = pDesc.value;
+      alert("✅ Product Updated Successfully!");
+    }
+  } 
+  // ADD NEW MODE
+  else {
+    let p = {
+      id: Date.now(),
+      title: pTitle.value,
+      price: +pPrice.value,
+      img: pImg.value,
+      video: pVideo.value,
+      desc: pDesc.value
+    };
+    products.push(p);
+    alert("✅ New Product Added!");
+  }
+
+  localStorage.setItem("products", JSON.stringify(products));
+  resetForm();
+  render();
 }
 
-/* Render List */
-function render(){
- list.innerHTML = products.map(p=>`
-  <div class="border border-purple-500 p-2 my-2 rounded">
-   <b>${p.title}</b> - ₹${p.price}<br>
-   <img src="${p.img}" class="w-24 h-16 object-cover mt-1 rounded">
-   <div class="mt-1">
-    <button onclick="del(${p.id})" class="bg-red-600 px-2 py-1 mt-1 rounded">Delete</button>
-   </div>
-  </div>
- `).join("");
+/* Edit Mode On Karenge */
+function edit(id){
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+
+  // Form bharna
+  pTitle.value = p.title;
+  pPrice.value = p.price;
+  pImg.value = p.img;
+  pVideo.value = p.video;
+  pDesc.value = p.desc;
+  
+  if(p.img){
+    previewImg.src = p.img;
+    previewImg.classList.remove("hidden");
+  }
+
+  // State Change
+  editingId = id;
+  document.getElementById("formTitle").innerText = "✏️ Edit Product";
+  document.getElementById("formTitle").className = "font-bold text-xl text-yellow-400";
+  
+  const btn = document.getElementById("submitBtn");
+  btn.innerText = "🔄 Update Product";
+  btn.className = "bg-yellow-500 hover:bg-yellow-600 transition font-bold px-4 py-3 rounded w-full text-lg text-black shadow-lg";
+
+  document.getElementById("cancelBtn").classList.remove("hidden");
+
+  // Scroll to top
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+/* Reset Form (Cancel or After Save) */
+function resetForm(){
+  pTitle.value = "";
+  pPrice.value = "";
+  pImg.value = "";
+  pVideo.value = "";
+  pDesc.value = "";
+  imgFile.value = "";
+  previewImg.classList.add("hidden");
+  
+  editingId = null;
+  document.getElementById("formTitle").innerText = "➕ Add New Product";
+  document.getElementById("formTitle").className = "font-bold text-xl text-purple-300";
+  
+  const btn = document.getElementById("submitBtn");
+  btn.innerText = "✅ Save Product";
+  btn.className = "bg-green-600 hover:bg-green-700 transition font-bold px-4 py-3 rounded w-full text-lg shadow-lg shadow-green-900/50";
+
+  document.getElementById("cancelBtn").classList.add("hidden");
 }
 
 /* Delete */
 function del(id){
- products = products.filter(x=>x.id!=id);
- localStorage.setItem("products",JSON.stringify(products));
- render();
+  if(confirm("Are you sure you want to delete this game?")){
+    products = products.filter(x => x.id != id);
+    localStorage.setItem("products", JSON.stringify(products));
+    render();
+    if(editingId === id) resetForm(); // Agar wahi edit kar rahe the jo delete kiya
+  }
 }
 
-/* Discount */
+/* Discount & Coupon Functions (Same as before) */
 function setDiscount(){
- localStorage.setItem("discount",discount.value);
- alert("Discount Applied!");
+  localStorage.setItem("discount", discount.value);
+  alert("Discount Set!");
 }
-
-/* Coupon */
 function saveCoupon(){
- let c={code:couponCode.value,off:couponOff.value};
- localStorage.setItem("coupon",JSON.stringify(c));
- alert("Coupon Saved!");
+  let c={code:couponCode.value, off:couponOff.value};
+  localStorage.setItem("coupon", JSON.stringify(c));
+  alert("Coupon Saved!");
 }
 
-/* Clear Form */
-function clearForm(){
- pTitle.value="";
- pPrice.value="";
- pImg.value="";
- pVideo.value="";
- pDesc.value="";
- imgFile.value="";
- previewImg.classList.add("hidden");
+/* Render List */
+function render(){
+  document.getElementById("countBadge").innerText = products.length;
+  list.innerHTML = products.map(p => `
+    <div class="flex items-start gap-3 bg-black/40 border border-slate-700 p-3 rounded-lg hover:border-purple-500 transition">
+      <img src="${p.img || 'https://via.placeholder.com/100'}" class="w-20 h-20 object-cover rounded bg-slate-800">
+      <div class="flex-1">
+        <div class="flex justify-between items-start">
+            <h3 class="font-bold text-lg text-white">${p.title}</h3>
+            <span class="text-green-400 font-mono font-bold">₹${p.price}</span>
+        </div>
+        <p class="text-xs text-gray-400 truncate w-48">${p.desc || 'No desc'}</p>
+        
+        <div class="flex gap-2 mt-3">
+          <button onclick="edit(${p.id})" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white text-sm py-1.5 rounded font-bold transition">
+            ✏️ Edit
+          </button>
+          <button onclick="del(${p.id})" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-sm py-1.5 rounded font-bold transition">
+            🗑 Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  `).reverse().join(""); // Newest first
+}
+
+// Load initial values
+discount.value = discountValue;
+if(coupon){
+  couponCode.value = coupon.code;
+  couponOff.value = coupon.off;
 }
 
 render();
 </script>
 </body>
 </html>
-```
