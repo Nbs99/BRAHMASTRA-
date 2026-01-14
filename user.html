@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Brahmastra Admin Panel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-white p-4">
+
+<h1 class="text-3xl font-bold text-purple-400 mb-2">Brahmastra Admin Panel</h1>
+<p class="mb-4 text-sm text-gray-400">Total Products: <span id="count"></span></p>
+
+<!-- SEARCH -->
+<input id="search" oninput="render()" placeholder="Search product..."
+ class="w-full mb-3 p-2 bg-black border border-purple-600">
+
+<!-- ADD PRODUCT -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">➕ Add / Edit Product</h2>
+
+<input id="pid" type="hidden">
+<input id="pTitle" placeholder="Title" class="w-full mb-2 p-2 bg-black border">
+<input id="pPrice" placeholder="Price" type="number" class="w-full mb-2 p-2 bg-black border">
+<input id="pImg" placeholder="Image URL" class="w-full mb-2 p-2 bg-black border">
+
+<input type="file" id="imgFile" accept="image/*"
+ class="w-full mb-2 p-2 bg-black border"
+ onchange="loadFromGallery(event)">
+
+<img id="previewImg" class="w-full h-40 object-cover rounded hidden mb-2">
+
+<input id="pVideo" placeholder="YouTube Embed URL" class="w-full mb-2 p-2 bg-black border">
+<textarea id="pDesc" placeholder="Description" class="w-full mb-2 p-2 bg-black border"></textarea>
+
+<button onclick="saveProduct()" class="bg-green-600 px-4 py-2 rounded w-full mb-2">
+ Save Product
+</button>
+
+<button onclick="addDemo()" class="bg-blue-600 px-4 py-2 rounded w-full">
+ 1-Click Demo Product
+</button>
+</div>
+
+<!-- DISCOUNT -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">💸 Discount</h2>
+<input id="discount" placeholder="Discount %" type="number" class="w-full mb-2 p-2 bg-black border">
+<button onclick="setDiscount()" class="bg-pink-600 px-4 py-2 rounded w-full">Apply</button>
+</div>
+
+<!-- COUPON -->
+<div class="bg-slate-900 p-4 rounded mb-4">
+<h2 class="font-bold text-xl mb-2">🎁 Coupon</h2>
+<input id="couponCode" placeholder="Coupon Code" class="w-full mb-2 p-2 bg-black border">
+<input id="couponOff" placeholder="Off %" type="number" class="w-full mb-2 p-2 bg-black border">
+<button onclick="saveCoupon()" class="bg-blue-600 px-4 py-2 rounded w-full">Save</button>
+</div>
+
+<!-- CLEAR -->
+<button onclick="clearAll()" class="bg-red-700 px-4 py-2 rounded w-full mb-4">
+ Delete All Products
+</button>
+
+<!-- PRODUCT LIST -->
+<div class="bg-slate-900 p-4 rounded">
+<h2 class="font-bold text-xl mb-2">📦 Products</h2>
+<div id="list"></div>
+</div>
+
+<script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+function loadFromGallery(e){
+ const file = e.target.files[0];
+ const r = new FileReader();
+ r.onload=()=>{ previewImg.src=r.result; previewImg.classList.remove("hidden"); pImg.value=r.result; }
+ r.readAsDataURL(file);
+}
+
+function saveProduct(){
+ let id = pid.value || Date.now();
+ let obj={
+  id:+id,
+  title:pTitle.value,
+  price:+pPrice.value,
+  img:pImg.value,
+  video:pVideo.value,
+  desc:pDesc.value,
+  show:true
+ };
+ products = products.filter(x=>x.id!=obj.id);
+ products.push(obj);
+ localStorage.setItem("products",JSON.stringify(products));
+ clearForm(); render();
+}
+
+function edit(p){
+ pid.value=p.id;
+ pTitle.value=p.title;
+ pPrice.value=p.price;
+ pImg.value=p.img;
+ pVideo.value=p.video;
+ pDesc.value=p.desc;
+ previewImg.src=p.img; previewImg.classList.remove("hidden");
+}
+
+function toggle(id){
+ let p=products.find(x=>x.id==id);
+ p.show=!p.show;
+ localStorage.setItem("products",JSON.stringify(products));
+ render();
+}
+
+function del(id){
+ products=products.filter(x=>x.id!=id);
+ localStorage.setItem("products",JSON.stringify(products));
+ render();
+}
+
+function render(){
+ let s=search.value.toLowerCase();
+ let f=products.filter(p=>p.title.toLowerCase().includes(s));
+ count.innerText=f.length;
+ list.innerHTML=f.map(p=>`
+ <div class="border border-purple-500 p-2 my-2 rounded ${p.show?'':'opacity-40'}">
+ <b>${p.title}</b> - ₹${p.price} <br>
+ <img src="${p.img}" class="w-24 h-16 object-cover mt-1 rounded">
+ ${p.video?`<iframe class="w-full h-32 mt-1" src="${p.video}"></iframe>`:""}
+ <div class="mt-1 flex gap-2 flex-wrap">
+  <button onclick='edit(${JSON.stringify(p)})' class="bg-yellow-600 px-2 py-1 rounded">Edit</button>
+  <button onclick="toggle(${p.id})" class="bg-indigo-600 px-2 py-1 rounded">${p.show?'Hide':'Show'}</button>
+  <button onclick="del(${p.id})" class="bg-red-600 px-2 py-1 rounded">Delete</button>
+ </div>
+ </div>`).join("");
+}
+
+function addDemo(){
+ pTitle.value="GTA 6";
+ pPrice.value=1999;
+ pImg.value="https://i.imgur.com/Qr71crq.jpg";
+ pDesc.value="Next gen open world game";
+ saveProduct();
+}
+
+function clearAll(){
+ if(confirm("Delete all products?")){
+ localStorage.removeItem("products");
+ products=[]; render();
+ }
+}
+
+function setDiscount(){ localStorage.setItem("discount",discount.value); alert("Discount Set"); }
+function saveCoupon(){ localStorage.setItem("coupon",JSON.stringify({code:couponCode.value,off:couponOff.value})); alert("Coupon Saved"); }
+
+function clearForm(){
+ pid.value=""; pTitle.value=""; pPrice.value=""; pImg.value=""; pVideo.value=""; pDesc.value="";
+ imgFile.value=""; previewImg.classList.add("hidden");
+}
+
+render();
+</script>
+</body>
+</html>
