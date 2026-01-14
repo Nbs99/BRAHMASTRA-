@@ -22,6 +22,7 @@ body{margin:0;background:#0f0f12;color:white;font-family:'Segoe UI',sans-serif}
 </head>
 <body class="pb-24">
 
+<!-- NAV -->
 <nav class="sticky top-0 z-50 glass px-4 py-3 flex justify-between items-center">
  <h1 class="text-xl font-bold text-purple-400">BRAHMASTRA</h1>
  <div class="relative cursor-pointer" onclick="toggleCart()">
@@ -42,7 +43,7 @@ body{margin:0;background:#0f0f12;color:white;font-family:'Segoe UI',sans-serif}
   class="w-full bg-[#1c1c24] p-3 rounded-xl border border-gray-700">
 </div>
 
-<!-- GRID -->
+<!-- PRODUCTS -->
 <div class="px-4 mt-4 grid grid-cols-2 md:grid-cols-4 gap-4" id="gamesGrid"></div>
 
 <button onclick="toggleCart()" class="float-cart bg-purple-600 w-14 h-14 rounded-full flex items-center justify-center text-2xl">
@@ -86,18 +87,10 @@ let discount = +localStorage.getItem("discount") || 0;
 let couponData = JSON.parse(localStorage.getItem("coupon")) || null;
 let appliedCoupon = 0;
 
-// Convert admin products to games
+// Convert admin products
 let games = adminProducts.filter(p=>p.show).map(p=>({
- id:p.id,
- title:p.title,
- price:p.price,
- img:p.img,
- video:p.video||"",
- desc:p.desc||"",
- platform:"Admin",
- genre:"Game"
+ id:p.id,title:p.title,price:p.price,img:p.img,video:p.video||"",desc:p.desc||""
 }));
-
 if(!games.length){
  games=[{id:1,title:"Demo Game",price:999,img:"https://picsum.photos/400",video:"",desc:"Demo product"}];
 }
@@ -136,12 +129,10 @@ function addToCart(id){
  let i=cart.find(x=>x.id===id);
  if(i) i.qty++;
  else cart.push({...g,qty:1});
- saveCart();
- showToast("Added to cart");
+ saveCart(); showToast("Added to cart");
 }
 function removeFromCart(id){
- cart=cart.filter(x=>x.id!==id);
- saveCart();
+ cart=cart.filter(x=>x.id!==id); saveCart();
 }
 function saveCart(){
  localStorage.setItem("brahmastra_cart",JSON.stringify(cart));
@@ -152,8 +143,7 @@ function updateCartUI(){
  let t=0;
  cartItems.innerHTML=cart.length?cart.map(i=>{
   let p=finalPrice(i); t+=p*i.qty;
-  return `
-  <div class="flex justify-between">
+  return `<div class="flex justify-between">
    <span>${i.title} × ${i.qty}</span>
    <span>₹${p*i.qty}</span>
    <button onclick="removeFromCart(${i.id})">❌</button>
@@ -167,8 +157,7 @@ function applyCoupon(){
  if(!couponData) return showToast("No coupon active");
  if(couponInput.value===couponData.code){
   appliedCoupon=couponData.off;
-  showToast("Coupon Applied");
-  updateCartUI();
+  showToast("Coupon Applied"); updateCartUI();
  }else showToast("Invalid Coupon");
 }
 
@@ -186,10 +175,7 @@ function openModal(id){
  }
  gameModal.classList.remove("hidden");
 }
-function closeModal(){
- gameModal.classList.add("hidden");
- mVideo.src="";
-}
+function closeModal(){gameModal.classList.add("hidden");mVideo.src="";}
 
 // ===== CART DRAWER =====
 function toggleCart(){
@@ -198,8 +184,7 @@ function toggleCart(){
 
 // ===== TOAST =====
 function showToast(t){
- toast.innerText=t;
- toast.classList.add("show");
+ toast.innerText=t; toast.classList.add("show");
  setTimeout(()=>toast.classList.remove("show"),2000);
 }
 
@@ -213,8 +198,7 @@ setInterval(()=>{
 },4000);
 
 // INIT
-renderGames();
-updateCartUI();
+renderGames(); updateCartUI();
 </script>
 </body>
 </html>
