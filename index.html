@@ -2,160 +2,400 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Brahmastra Game Store</title>
+<title>Brahmastra Game Store Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#020617;color:white;overflow-x:hidden}
-.glass{background:rgba(255,255,255,.07);backdrop-filter:blur(10px)}
-.card3d{transition:.35s}
-.card3d:hover{transform:scale(1.05);box-shadow:0 20px 40px rgba(255,0,255,.4)}
-.up-track{display:flex;gap:16px;width:max-content;animation:scrollLeft 25s linear infinite}
-@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.up-card{min-width:260px;border:1px solid purple;border-radius:14px;overflow:hidden}
-.up-card img{width:100%;height:170px;object-fit:cover}
-.category-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:0 8px}
-.platform-btn{background:linear-gradient(to right,#8b5cf6,#ec4899);padding:8px 0;border-radius:999px;font-weight:bold;width:100%;font-size:clamp(10px,2.5vw,14px)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9999}
-.no-scroll{overflow:hidden;height:100vh}
-.card-img{height:150px;object-fit:cover}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0f0f12;color:white;font-family:'Segoe UI', sans-serif;overflow-x:hidden}
+  
+  /* Glassmorphism */
+  .glass{background:rgba(30, 30, 40, 0.6);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08);box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);}
+  
+  /* Animations */
+  .card-hover{transition:all 0.3s ease;}
+  .card-hover:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(124, 58, 237, 0.2)}
+  
+  .fade-in{animation:fadeIn 0.5s ease-in-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:8px}
+  ::-webkit-scrollbar-track{background:#111}
+  ::-webkit-scrollbar-thumb{background:#4c1d95;border-radius:4px}
+
+  /* Slider */
+  .slider-container {position: relative; overflow: hidden; height: 220px; border-radius: 16px; margin-bottom: 20px;}
+  .slide {position: absolute; inset: 0; opacity: 0; transition: opacity 1s ease-in-out; object-fit: cover; width: 100%; height: 100%;}
+  .slide.active {opacity: 1;}
+
+  /* Floating Cart */
+  .float-cart{position:fixed;bottom:20px;right:20px;z-index:100;animation:bounce 2s infinite}
+  @keyframes bounce {0%, 100% {transform: translateY(0);} 50% {transform: translateY(-10px);}}
+
+  /* Toast */
+  .toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:12px 24px;border-radius:50px;font-weight:bold;z-index:9999;opacity:0;pointer-events:none;transition:0.3s}
+  .toast.show{top:80px;opacity:1}
 </style>
 </head>
-<body>
+<body class="pb-20">
 
-<h1 class="text-center py-5 text-4xl font-extrabold text-purple-400">
- BRAHMASTRA GAME STORE
-</h1>
-
-<div class="text-center text-pink-400 font-bold text-xl mt-2">🔥 Upcoming Games</div>
-
-<div class="overflow-hidden border-y border-pink-500 py-4 bg-black mt-2">
- <div id="upcomingTrack" class="up-track"></div>
-</div>
-
-<div class="category-grid my-5">
- <button onclick="filterPlatform('Steam')" class="platform-btn">STEAM</button>
- <button onclick="filterPlatform('Epic')" class="platform-btn">EPIC</button>
- <button onclick="filterPlatform('Ubisoft')" class="platform-btn">UBISOFT</button>
- <button onclick="filterPlatform('BattleNet')" class="platform-btn">BATTLE.NET</button>
- <button onclick="filterPlatform('All')" class="platform-btn bg-gray-600">ALL</button>
-</div>
-
-<div class="px-3 pb-10">
- <div id="gamesBox" class="grid grid-cols-3 md:grid-cols-4 gap-4 justify-items-center"></div>
-</div>
-
-<!-- MODAL -->
-<div id="gameModal" class="hidden modal" onclick="closeModal()">
- <div class="glass w-[94%] sm:w-[85%] md:w-2/3 lg:w-1/2 p-5 rounded-xl" onclick="event.stopPropagation()">
-  <button onclick="closeModal()" class="float-right text-xl">❌</button>
-
-  <h2 id="mTitle" class="text-2xl text-purple-400"></h2>
-  <p id="mDesc" class="text-gray-300 my-2"></p>
-
-  <!-- Video on top -->
-  <iframe id="mVideo" class="w-full h-[220px] sm:h-[260px] md:h-[300px] rounded" allowfullscreen></iframe>
-
-  <!-- Buttons -->
-  <div class="mt-3 space-y-2">
-    <button onclick="toggleReq()" class="w-full bg-purple-600 py-2 rounded font-bold">
-      📋 System Requirements
-    </button>
-
-    <div id="reqBox" class="hidden glass p-3 rounded text-sm">
-      <p><b>Minimum:</b> i3 / 8GB RAM / GTX 750 / 40GB</p>
-      <p><b>Recommended:</b> i5 / 16GB RAM / GTX 1660 / 60GB</p>
+<nav class="sticky top-0 z-50 glass border-b-0 px-4 py-3 flex justify-between items-center">
+  <div class="flex items-center gap-2">
+    <i class="ri-gamepad-fill text-3xl text-purple-500"></i>
+    <h1 class="text-xl font-bold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">BRAHMASTRA</h1>
+  </div>
+  
+  <div class="flex items-center gap-4">
+    <div class="hidden sm:flex flex-col items-end mr-2">
+      <span class="text-xs text-gray-400">Wallet Balance</span>
+      <span class="text-green-400 font-bold font-mono">₹4,500.00</span>
     </div>
+    <div class="relative cursor-pointer" onclick="toggleCart()">
+      <i class="ri-shopping-cart-2-line text-2xl hover:text-purple-400 transition"></i>
+      <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold">0</span>
+    </div>
+    <img src="https://i.pravatar.cc/100?img=12" class="w-9 h-9 rounded-full border-2 border-purple-500">
+  </div>
+</nav>
 
-    <button onclick="goSupport()" class="w-full bg-blue-600 py-2 rounded font-bold">
-      📞 Customer Care
-    </button>
+<div class="px-4 mt-4">
+  <div class="slider-container relative group">
+    <img src="https://wallpapers.com/images/hd/cyberpunk-2077-yellow-background-49l9j5z15l0j5z15.jpg" class="slide active">
+    <img src="https://wallpapers.com/images/hd/grand-theft-auto-v-pc-game-poster-9z6894033j54128q.jpg" class="slide">
+    <img src="https://wallpapers.com/images/hd/god-of-war-ragnarok-kratos-and-atreus-wolf-b170w7k53351368b.jpg" class="slide">
+    
+    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+    <div class="absolute bottom-5 left-5">
+      <span class="bg-red-600 text-xs px-2 py-1 rounded font-bold mb-2 inline-block">TRENDING</span>
+      <h2 class="text-3xl font-bold">Season Sale is Live!</h2>
+      <p class="text-gray-300 text-sm">Get up to 70% off on AAA Titles</p>
+    </div>
+  </div>
+</div>
 
-    <button id="mOrder" class="w-full bg-green-500 py-2 rounded font-bold">
-      🛒 Order on WhatsApp
+<div class="px-4 mb-6">
+  <div class="relative mb-4">
+    <i class="ri-search-line absolute left-4 top-3 text-gray-500"></i>
+    <input type="text" id="searchInput" onkeyup="renderGames()" placeholder="Search for games (e.g. GTA, COD)..." 
+    class="w-full bg-[#1c1c24] border border-gray-700 text-white pl-12 pr-4 py-3 rounded-xl focus:outline-none focus:border-purple-500 transition">
+  </div>
+
+  <div class="flex gap-3 overflow-x-auto pb-2 no-scrollbar" id="filters">
+    <button onclick="setFilter('all')" class="filter-btn active whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-purple-600 border border-purple-500">🔥 All</button>
+    <button onclick="setFilter('Steam')" class="filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-[#1c1c24] border border-gray-700 hover:bg-gray-800">Steam</button>
+    <button onclick="setFilter('Epic')" class="filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-[#1c1c24] border border-gray-700 hover:bg-gray-800">Epic</button>
+    <button onclick="setFilter('Action')" class="filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-[#1c1c24] border border-gray-700 hover:bg-gray-800">🔫 Action</button>
+    <button onclick="setFilter('Racing')" class="filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-[#1c1c24] border border-gray-700 hover:bg-gray-800">🏎️ Racing</button>
+    <button onclick="setFilter('RPG')" class="filter-btn whitespace-nowrap px-5 py-2 rounded-full text-sm font-bold bg-[#1c1c24] border border-gray-700 hover:bg-gray-800">⚔️ RPG</button>
+  </div>
+</div>
+
+<div class="px-4">
+  <div id="gamesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    </div>
+</div>
+
+<button onclick="toggleCart()" class="float-cart md:hidden bg-gradient-to-r from-purple-600 to-pink-600 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white text-2xl">
+  <i class="ri-shopping-bag-3-fill"></i>
+</button>
+
+<div id="cartDrawer" class="fixed inset-y-0 right-0 w-full sm:w-[400px] bg-[#15151a] shadow-2xl transform translate-x-full transition-transform duration-300 z-[100] border-l border-gray-800 flex flex-col">
+  <div class="p-5 border-b border-gray-800 flex justify-between items-center bg-[#1c1c24]">
+    <h2 class="text-xl font-bold flex items-center gap-2"><i class="ri-shopping-cart-fill text-purple-500"></i> My Cart</h2>
+    <button onclick="toggleCart()" class="text-gray-400 hover:text-white"><i class="ri-close-line text-2xl"></i></button>
+  </div>
+  
+  <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-4">
+    <div class="text-center text-gray-500 mt-10">Your cart is empty 🕸️</div>
+  </div>
+
+  <div class="p-5 border-t border-gray-800 bg-[#1c1c24]">
+    <div class="flex justify-between text-lg font-bold mb-4">
+      <span>Total:</span>
+      <span class="text-green-400" id="cartTotal">₹0</span>
+    </div>
+    <button onclick="checkout()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2">
+      <i class="ri-whatsapp-line text-xl"></i> Checkout on WhatsApp
     </button>
   </div>
- </div>
 </div>
+
+<div id="gameModal" class="fixed inset-0 bg-black/90 hidden z-[200] flex items-center justify-center p-4 backdrop-blur-sm" onclick="closeModal()">
+  <div class="bg-[#15151a] w-full max-w-2xl rounded-2xl overflow-hidden border border-gray-800 shadow-2xl relative" onclick="event.stopPropagation()">
+    <button onclick="closeModal()" class="absolute top-3 right-3 z-10 bg-black/50 p-2 rounded-full text-white hover:bg-red-600 transition"><i class="ri-close-line"></i></button>
+    
+    <div class="relative pt-[56.25%] bg-black">
+      <iframe id="mVideo" class="absolute inset-0 w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
+    </div>
+    
+    <div class="p-6">
+      <div class="flex justify-between items-start mb-2">
+        <h2 id="mTitle" class="text-2xl font-bold text-white"></h2>
+        <div class="text-right">
+          <p id="mPrice" class="text-2xl font-bold text-green-400"></p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 mb-4">
+        <span id="mPlatform" class="text-xs bg-purple-900/50 text-purple-300 px-2 py-1 rounded border border-purple-500/30"></span>
+        <span id="mGenre" class="text-xs bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-500/30"></span>
+      </div>
+
+      <p id="mDesc" class="text-gray-400 text-sm leading-relaxed mb-6"></p>
+
+      <div class="grid grid-cols-2 gap-4">
+        <button id="mAddToCart" class="bg-gray-800 hover:bg-gray-700 py-3 rounded-xl font-bold text-white border border-gray-700 transition">
+          Add to Cart
+        </button>
+        <button id="mBuyNow" class="bg-gradient-to-r from-purple-600 to-pink-600 py-3 rounded-xl font-bold text-white shadow-lg hover:shadow-purple-500/25 transition">
+          Buy Now
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast">Action Successful!</div>
 
 <script>
-const upcomingGames=[
- {title:"CRICKET26",img:"https://image2url.com/r2/default/images/1768428975489-955bd778-9e39-4aa3-9905-cd6e4b849f03.jpg"},
- {title:"Cyber War X",img:"https://picsum.photos/600?2"},
- {title:"Racing Pro 2026",img:"https://picsum.photos/600?3"},
- {title:"Zombie World",img:"https://picsum.photos/600?4"}
+// --- GAME DATABASE ---
+const games = [
+  { id: 1, title: "GTA V Premium", price: 950, old: 1999, platform: "Epic", genre: "Action", img: "https://image.api.playstation.com/vulcan/ap/disc/25/CUSA00411_00/8051756534975583.png", video: "https://www.youtube.com/embed/QkkoHAzjnUs" },
+  { id: 2, title: "Cyberpunk 2077", price: 2999, old: 3500, platform: "Steam", genre: "RPG", img: "https://wallpapers.com/images/hd/cyberpunk-2077-yellow-background-49l9j5z15l0j5z15.jpg", video: "https://www.youtube.com/embed/8X2kIfS6fb8" },
+  { id: 3, title: "Forza Horizon 5", price: 3499, old: 4999, platform: "Steam", genre: "Racing", img: "https://store-images.s-microsoft.com/image/apps.13867.13510798887556396.6578a101-10c1-4081-807d-5a81e3cc6c12.38547b77-50a8-444a-a43b-31215b2447c2", video: "https://www.youtube.com/embed/FYH9n37B7Yw" },
+  { id: 4, title: "God of War", price: 1500, old: 3299, platform: "Epic", genre: "Action", img: "https://image.api.playstation.com/vulcan/ap/disc/25/CUSA07408_00/1572915674719586.png", video: "https://www.youtube.com/embed/K0u_kAWLJOA" },
+  { id: 5, title: "Elden Ring", price: 3599, old: 0, platform: "Steam", genre: "RPG", img: "https://image.api.playstation.com/vulcan/ap/disc/25/CUSA18581_00/2712953282245206.png", video: "https://www.youtube.com/embed/E3Huy2cdih0" },
+  { id: 6, title: "Valorant Points", price: 450, old: 500, platform: "Riot", genre: "Action", img: "https://cdn1.codashop.com/S/content/mobile/images/product-tiles/valorant_tile_new.jpg", video: "https://www.youtube.com/embed/e_E9W2vsRbQ" },
+  { id: 7, title: "Minecraft Java", price: 1999, old: 0, platform: "Microsoft", genre: "RPG", img: "https://image.api.playstation.com/vulcan/img/rnd/202010/2119/9f7a738c824c6e00b3f545084992524a9840b7d7.png", video: "https://www.youtube.com/embed/MmB9b5njVbA" },
+  { id: 8, title: "FIFA 24 / FC24", price: 1200, old: 4000, platform: "EA", genre: "Sports", img: "https://upload.wikimedia.org/wikipedia/en/b/b3/EA_Sports_FC_24_cover.jpg", video: "https://www.youtube.com/embed/XhP3Xh4LMA8" }
 ];
 
-const games=[
- {id:1,title:"Cyber Strike",price:3500,platform:"Steam",img:"https://image2url.com/r2/default/images/1768428975489-955bd778-9e39-4aa3-9905-cd6e4b849f03.jpg",desc:"sports",video:"https://youtu.be/a9bhohGxKHM?si=Hn39gFfo-06shPLC"}
- {id:2,title:"Fantasy Quest",price:1999,platform:"Epic",img:"https://picsum.photos/500?11",desc:"Magic RPG adventure.",video:"https://www.youtube.com/embed/2Gg6Seob5Mg"},
- {id:3,title:"Speed Racers",price:2499,platform:"Steam",img:"https://picsum.photos/500?12",desc:"High speed racing.",video:"https://www.youtube.com/embed/5eZKcXc0Pns"},
- {id:4,title:"Battle Arena",price:0,platform:"Ubisoft",img:"https://picsum.photos/500?13",desc:"Free battle royale.",video:"https://www.youtube.com/embed/8zC7r9Kj0cE"},
- {id:5,title:"War Zone",price:3499,platform:"BattleNet",img:"https://picsum.photos/500?14",desc:"War shooter.",video:"https://www.youtube.com/embed/0E44DClsX5Q"}
-];
+// --- STATE MANAGEMENT ---
+let cart = JSON.parse(localStorage.getItem('brahmastra_cart')) || [];
+let wishlist = JSON.parse(localStorage.getItem('brahmastra_wishlist')) || [];
+let currentFilter = 'all';
 
-let currentPlatform="All";
-
-function renderUpcoming(){
- const box=document.getElementById("upcomingTrack");
- const loop=[...upcomingGames,...upcomingGames];
- box.innerHTML=loop.map(g=>`
-  <div class="up-card glass">
-   <img src="${g.img}">
-   <div class="p-2 text-center text-pink-400 font-bold">${g.title}</div>
-  </div>`).join("");
+// --- INIT ---
+function init() {
+  renderGames();
+  updateCartUI();
+  startSlider();
 }
 
-function filterPlatform(p){currentPlatform=p;renderGames();}
+// --- RENDER LOGIC ---
+function renderGames() {
+  const grid = document.getElementById("gamesGrid");
+  const search = document.getElementById("searchInput").value.toLowerCase();
+  
+  const filtered = games.filter(g => {
+    const matchFilter = currentFilter === 'all' || g.platform === currentFilter || g.genre === currentFilter;
+    const matchSearch = g.title.toLowerCase().includes(search);
+    return matchFilter && matchSearch;
+  });
 
-function renderGames(){
- const list=currentPlatform==="All"?games:games.filter(g=>g.platform===currentPlatform);
- gamesBox.innerHTML=list.map(g=>`
-  <div class="card3d glass w-full max-w-[220px] rounded-xl cursor-pointer p-2">
-   <img src="${g.img}" class="w-full card-img rounded">
-   <div class="p-2 text-center">
-    <h3 class="font-bold">${g.title}</h3>
-    <p class="text-green-400 mb-2">${g.price==0?"FREE":"₹"+g.price}</p>
-    <button onclick="openGame(${g.id})"
-     class="bg-gradient-to-r from-purple-500 to-pink-500 w-full py-1 rounded font-bold">
-      Buy Now
-    </button>
-   </div>
-  </div>
- `).join("");
+  if(!filtered.length) {
+    grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">No games found 😔</div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(g => {
+    const isLiked = wishlist.includes(g.id) ? 'text-red-500 ri-heart-fill' : 'text-gray-400 ri-heart-line';
+    const isSale = g.price < g.old && g.old > 0;
+
+    return `
+    <div class="glass rounded-xl overflow-hidden card-hover relative group">
+      <button onclick="toggleWishlist(event, ${g.id})" class="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-black/60 flex items-center justify-center transition hover:bg-white">
+        <i class="${isLiked} text-lg"></i>
+      </button>
+
+      <div class="relative overflow-hidden h-40" onclick="openModal(${g.id})">
+        <img src="${g.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+        ${isSale ? `<span class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded">SALE</span>` : ''}
+        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition"></div>
+      </div>
+      
+      <div class="p-3">
+        <h3 class="font-bold text-sm truncate text-gray-100">${g.title}</h3>
+        <p class="text-xs text-gray-400 mb-2">${g.platform}</p>
+        
+        <div class="flex justify-between items-end">
+          <div>
+            ${g.old > 0 ? `<p class="text-[10px] text-gray-500 line-through">₹${g.old}</p>` : ''}
+            <p class="text-green-400 font-bold text-sm">₹${g.price}</p>
+          </div>
+          <button onclick="addToCart(${g.id})" class="bg-purple-600 hover:bg-purple-500 text-white w-8 h-8 rounded-lg flex items-center justify-center">
+            <i class="ri-add-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  `}).join('');
 }
 
-function openGame(id){
- const g=games.find(x=>x.id===id);
- document.body.classList.add("no-scroll");
- gameModal.classList.remove("hidden");
- mTitle.innerText=g.title;
- mDesc.innerText=g.desc;
- mVideo.src=g.video;
- mOrder.onclick=()=>{
-  const msg=`Hi, mujhe ye game chahiye:\n${g.title}\n₹${g.price}`;
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg),"_blank");
- };
+// --- FILTERS ---
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.remove('bg-purple-600', 'border-purple-500');
+    b.classList.add('bg-[#1c1c24]', 'border-gray-700');
+    if(b.innerText.includes(filter) || (filter==='all' && b.innerText.includes('All'))) {
+      b.classList.add('bg-purple-600', 'border-purple-500');
+      b.classList.remove('bg-[#1c1c24]', 'border-gray-700');
+    }
+  });
+  renderGames();
 }
 
-function closeModal(){
- gameModal.classList.add("hidden");
- mVideo.src="";
- document.body.classList.remove("no-scroll");
+// --- CART FUNCTIONS ---
+function addToCart(id) {
+  const game = games.find(g => g.id === id);
+  if (!cart.some(item => item.id === id)) {
+    cart.push(game);
+    saveCart();
+    showToast(`${game.title} added to cart!`);
+  } else {
+    showToast("Already in cart!");
+  }
 }
 
-function toggleReq(){
- document.getElementById("reqBox").classList.toggle("hidden");
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  saveCart();
 }
 
-function goSupport(){
- window.open("https://wa.me/919313339081","_blank");
+function saveCart() {
+  localStorage.setItem('brahmastra_cart', JSON.stringify(cart));
+  updateCartUI();
 }
 
-renderUpcoming();
-renderGames();
+function updateCartUI() {
+  // Update Badge
+  const badge = document.getElementById("cartCount");
+  badge.innerText = cart.length;
+  badge.style.display = cart.length ? 'flex' : 'none';
+
+  // Update Drawer Items
+  const container = document.getElementById("cartItems");
+  const totalEl = document.getElementById("cartTotal");
+  let total = 0;
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-gray-500">
+      <i class="ri-shopping-cart-2-line text-4xl mb-2 opacity-50"></i>
+      <p>Cart is empty</p>
+    </div>`;
+  } else {
+    container.innerHTML = cart.map(item => {
+      total += item.price;
+      return `
+      <div class="flex gap-3 bg-[#252530] p-3 rounded-xl border border-gray-700 animate-fade">
+        <img src="${item.img}" class="w-16 h-16 object-cover rounded-lg">
+        <div class="flex-1">
+          <h4 class="font-bold text-sm text-gray-200">${item.title}</h4>
+          <p class="text-green-400 font-mono text-xs">₹${item.price}</p>
+        </div>
+        <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-400">
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+      `;
+    }).join('');
+  }
+  totalEl.innerText = "₹" + total;
+}
+
+function toggleCart() {
+  const drawer = document.getElementById("cartDrawer");
+  if (drawer.style.transform === 'translateX(0%)') {
+    drawer.style.transform = 'translateX(100%)';
+  } else {
+    drawer.style.transform = 'translateX(0%)';
+  }
+}
+
+// --- WISHLIST ---
+function toggleWishlist(e, id) {
+  e.stopPropagation(); // prevent modal open
+  if (wishlist.includes(id)) {
+    wishlist = wishlist.filter(x => x !== id);
+    showToast("Removed from Favorites");
+  } else {
+    wishlist.push(id);
+    showToast("Added to Favorites");
+  }
+  localStorage.setItem('brahmastra_wishlist', JSON.stringify(wishlist));
+  renderGames();
+}
+
+// --- CHECKOUT ---
+function checkout() {
+  if (cart.length === 0) return showToast("Cart is empty!");
+  
+  let msg = "👋 Hi Brahmastra Store, I want to order:\n\n";
+  let total = 0;
+  
+  cart.forEach((item, index) => {
+    msg += `${index + 1}. *${item.title}* - ₹${item.price}\n`;
+    total += item.price;
+  });
+  
+  msg += `\n💰 *Total Price: ₹${total}*`;
+  
+  window.open("https://wa.me/919313339081?text=" + encodeURIComponent(msg), "_blank");
+}
+
+// --- MODAL ---
+function openModal(id) {
+  const g = games.find(x => x.id === id);
+  const modal = document.getElementById("gameModal");
+  
+  document.getElementById("mTitle").innerText = g.title;
+  document.getElementById("mDesc").innerText = `${g.title} is a top-rated ${g.genre} game available on ${g.platform}. Experience high-quality gameplay.`;
+  document.getElementById("mPrice").innerText = "₹" + g.price;
+  document.getElementById("mPlatform").innerText = g.platform;
+  document.getElementById("mGenre").innerText = g.genre;
+  document.getElementById("mVideo").src = g.video;
+  
+  // Btns
+  document.getElementById("mAddToCart").onclick = () => { addToCart(id); closeModal(); };
+  document.getElementById("mBuyNow").onclick = () => { 
+    const msg = `Hi, I want to buy *${g.title}* for ₹${g.price}`;
+    window.open("https://wa.me/919313339081?text=" + encodeURIComponent(msg), "_blank");
+  };
+
+  modal.classList.remove("hidden");
+}
+
+function closeModal() {
+  const modal = document.getElementById("gameModal");
+  modal.classList.add("hidden");
+  document.getElementById("mVideo").src = "";
+}
+
+// --- UTILS ---
+function showToast(txt) {
+  const t = document.getElementById("toast");
+  t.innerText = txt;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// --- AUTO SLIDER ---
+function startSlider() {
+  let idx = 0;
+  const slides = document.querySelectorAll('.slide');
+  setInterval(() => {
+    slides[idx].classList.remove('active');
+    idx = (idx + 1) % slides.length;
+    slides[idx].classList.add('active');
+  }, 4000);
+}
+
+// Run
+init();
+
 </script>
 </body>
 </html>
-```
