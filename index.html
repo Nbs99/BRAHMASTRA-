@@ -2,189 +2,223 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brahmastra Gaming | Premium Store</title>
+<title>Brahmastra Gaming Store</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<!-- Gamer Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+
 <style>
-    /* --- CSS (Design & Animations) --- */
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+body{background:#0b0b10;color:white;font-family:Segoe UI}
+.card{background:#0f1218;border:1px solid #1f2430;transition:.3s;position:relative}
+.card:hover{transform:translateY(-5px)}
+.discount{background:#b91c1c;padding:4px 8px;font-size:12px;font-weight:bold}
+.old{color:#888;text-decoration:line-through;font-size:13px}
+.price{color:#22c55e;font-size:20px;font-weight:bold}
+.btn{background:#2a2f3a;color:#ccc}
+.btn:hover{background:#3b4252;color:white}
+.glass{background:rgba(20,20,30,.7);backdrop-filter:blur(10px)}
+.showBox{width:220px;background:#111;border-radius:12px;padding:10px;flex-shrink:0}
+.showBox img{height:140px;width:100%;object-fit:cover;border-radius:8px}
+.upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-    body {
-        background-color: #050505;
-        color: #fff;
-        font-family: 'Rajdhani', sans-serif;
-        overflow-x: hidden;
-    }
-
-    /* Neon Glow Effects */
-    .neon-text {
-        text-shadow: 0 0 10px rgba(168, 85, 247, 0.7), 0 0 20px rgba(168, 85, 247, 0.5);
-    }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .glass-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        border-color: rgba(168, 85, 247, 0.5);
-        box-shadow: 0 20px 40px rgba(168, 85, 247, 0.2);
-    }
-
-    /* Loading Spinner for API Simulation */
-    .loader {
-        border: 4px solid #1f1f1f;
-        border-top: 4px solid #a855f7;
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
-        animation: spin 1s linear infinite;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #000; }
-    ::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #a855f7; }
-
-    .hero-bg {
-        background: radial-gradient(circle at center, #2e1065 0%, #000000 70%);
-    }
+/* GAMER LOGO */
+.logoText{
+  font-family:'Orbitron',sans-serif;
+  font-size:28px;
+  letter-spacing:2px;
+  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
+}
 </style>
 </head>
 <body>
 
-    <nav class="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i class="ri-gamepad-fill text-3xl text-purple-500"></i>
-                <h1 class="text-2xl font-bold tracking-widest font-[Orbitron] text-white">BRAHMASTRA<span class="text-purple-500">.NET</span></h1>
-            </div>
-            <div class="hidden md:flex gap-8 font-bold text-gray-400">
-                <a href="#" class="hover:text-purple-400 transition">STORE</a>
-                <a href="#" class="hover:text-purple-400 transition">LIBRARY</a>
-                <a href="#" class="hover:text-purple-400 transition">COMMUNITY</a>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="text-right hidden sm:block">
-                    <p class="text-xs text-gray-400">Welcome,</p>
-                    <p class="font-bold text-purple-400">Gamer_007</p>
-                </div>
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-10 h-10 rounded-full border-2 border-purple-600">
-            </div>
-        </div>
-    </nav>
+<!-- NAV -->
+<div class="bg-black flex justify-between items-center px-4 py-3 sticky top-0 z-50">
+ <div class="logoText">BRAHMASTRA</div>
+ <div onclick="toggleCart()">🛒 <span id="cartCount">0</span></div>
+</div>
 
-    <header class="hero-bg pt-32 pb-20 px-4 text-center">
-        <h2 class="text-5xl md:text-7xl font-[Orbitron] font-black mb-4 neon-text">NEXT GEN GAMING</h2>
-        <p class="text-gray-400 text-lg mb-8 max-w-2xl mx-auto">Experience the ultimate collection of AAA titles. Powered by C# Architecture.</p>
-        <button onclick="scrollToGames()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-full transition shadow-[0_0_20px_rgba(168,85,247,0.5)]">
-            EXPLORE GAMES
-        </button>
-    </header>
+<!-- UPCOMING TOP -->
+<div class="p-4 overflow-hidden">
+ <h2 class="text-yellow-400 font-bold mb-2">⏳ Upcoming</h2>
+ <div class="overflow-hidden">
+  <div id="upcomingTrack" class="upcoming-track"></div>
+ </div>
+</div>
 
-    <main class="max-w-7xl mx-auto px-4 py-10">
-        
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="text-2xl font-bold border-l-4 border-purple-500 pl-3">TRENDING TITLES</h3>
-            <button onclick="fetchGamesFromBackend()" class="text-sm bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded flex items-center gap-2">
-                <i class="ri-refresh-line"></i> Refresh API
-            </button>
-        </div>
+<!-- SEARCH -->
+<div class="p-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+ <input id="search" placeholder="Search game..." class="p-2 bg-black border">
+ <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border">
+ <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border">
+ <button onclick="render()" class="bg-purple-600 p-2">Apply</button>
+</div>
 
-        <div id="loader" class="hidden flex justify-center py-20">
-            <div class="loader"></div>
-        </div>
+<!-- SHOWCASE -->
+<div class="p-4 relative">
+ <h2 class="text-purple-400 font-bold mb-2">🔥 Featured</h2>
+ <button onclick="slideLeft()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">◀</button>
+ <button onclick="slideRight()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">▶</button>
+ <div class="overflow-hidden">
+  <div id="showcase" class="flex gap-4 transition-all duration-500"></div>
+ </div>
+</div>
 
-        <div id="gamesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            </div>
+<!-- RECENT -->
+<div class="p-4">
+ <h2 class="text-green-400 font-bold mb-2">👀 Recently Viewed</h2>
+ <div id="recentBox" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
+</div>
 
-    </main>
+<!-- PRODUCTS -->
+<div id="products" class="grid grid-cols-2 gap-3 p-3"></div>
 
-    <footer class="border-t border-white/10 bg-black py-10 mt-10 text-center text-gray-500">
-        <p>© 2026 Brahmastra Corp. Built with HTML5, Tailwind & C# Concept.</p>
-    </footer>
+<!-- CART -->
+<div id="cartBox" class="fixed top-0 right-0 w-[320px] h-full bg-black p-4 translate-x-full transition z-50">
+ <button onclick="toggleCart()">Close</button>
+ <div id="cartItems" class="mt-2"></div>
+ <p class="mt-2 font-bold">Total: ₹<span id="total">0</span></p>
+ <button onclick="checkout()" class="bg-green-600 w-full p-2 mt-2">Checkout WhatsApp</button>
+</div>
 
-    <script>
-        // --- 1. MOCK DATA (Yeh data asal mein C# Backend se aayega) ---
-        const backendData = [
-            { id: 101, title: "Grand Theft Auto VI", price: 5499, category: "Open World", rating: 5.0, img: "https://wallpapers.com/images/hd/gta-6-palm-trees-sunset-b5a032.jpg" },
-            { id: 102, title: "Black Myth: Wukong", price: 3999, category: "Action RPG", rating: 4.9, img: "https://wallpapers.com/images/hd/black-myth-wukong-4k-gaming-wallpaper-2-h2s1.jpg" },
-            { id: 103, title: "Cyberpunk 2077: Phantom", price: 2999, category: "Sci-Fi", rating: 4.7, img: "https://wallpapers.com/images/hd/cyberpunk-2077-yellow-background-49l9j5z15l0j5z15.jpg" },
-            { id: 104, title: "Elden Ring: Shadow", price: 3499, category: "Souls-like", rating: 4.9, img: "https://wallpapers.com/images/hd/elden-ring-game-cover-art-7f55.jpg" },
-            { id: 105, title: "Call of Duty: BO6", price: 5999, category: "FPS", rating: 4.5, img: "https://wallpapers.com/images/hd/call-of-duty-black-ops-cold-war-key-art-4k-wallpaper-8k-uhd-3840x2160-5j5.jpg" },
-            { id: 106, title: "Forza Motorsport", price: 4499, category: "Racing", rating: 4.6, img: "https://wallpapers.com/images/hd/forza-horizon-5-4k-game-cover-7s2.jpg" }
-        ];
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center" onclick="closeModal()">
+ <div class="bg-[#15151a] w-full max-w-lg rounded-xl p-4" onclick="event.stopPropagation()">
+  <button onclick="closeModal()" class="float-right text-xl">✖</button>
+  <iframe id="mVideo" class="w-full h-56 mb-3"></iframe>
+  <h2 id="mTitle" class="text-2xl font-bold"></h2>
+  <p id="mPrice" class="text-green-400 text-xl font-bold my-2"></p>
+  <div class="grid grid-cols-2 gap-3 mt-3">
+   <button id="mAdd" class="bg-purple-600 py-3 rounded text-lg font-bold">Add to Cart</button>
+   <button id="mBuy" class="bg-green-600 py-3 rounded text-lg font-bold">Buy Now</button>
+  </div>
+ </div>
+</div>
 
-        // --- 2. C# API SIMULATION FUNCTION ---
-        // Asal project mein hum yaha 'fetch("https://api.brahmastra.com/games")' use karte
-        async function fetchGamesFromBackend() {
-            const container = document.getElementById("gamesContainer");
-            const loader = document.getElementById("loader");
+<script>
+let products=[
+{id:1,title:"Resident Evil Requiem",price:3607,old:4399,video:"https://www.youtube.com/embed/K0u_kAWLJOA",img:"https://wallpapers.com/images/hd/resident-evil-4-remake-leon-4k-9m1u8u5j7f5k4wvn.jpg"},
+{id:2,title:"Reanimal Deluxe",price:2160,old:2400,video:"https://www.youtube.com/embed/dQw4w9WgXcQ",img:"https://wallpapers.com/images/hd/dark-fantasy-game-wallpaper-4k-5m3xtq8x3x2mzyaw.jpg"},
+{id:3,title:"Core Keeper",price:899,old:0,video:"",img:"https://wallpapers.com/images/hd/core-keeper-game-art-4k-w8jvhc6iydk8m2ts.jpg"},
+{id:4,title:"Alice VR",price:1299,old:0,video:"",img:"https://wallpapers.com/images/hd/vr-game-desert-landscape-4k-2p0z47d6jq7c5qj0.jpg"}
+];
+while(products.length<40){
+ let i=products.length+1;
+ products.push({id:i,title:"Demo Game "+i,price:500+i*40,old:0,
+ video:"https://www.youtube.com/embed/dQw4w9WgXcQ",
+ img:"https://picsum.photos/400?random="+i});
+}
 
-            // UI Clear karo
-            container.innerHTML = "";
-            loader.classList.remove("hidden");
+let showcaseGames=products.slice(0,6);
+let upcomingGames=[
+{title:"GTA VI",date:"2025",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
+{title:"Witcher 4",date:"2025",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+{title:"Far Cry 7",date:"2025",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
+];
 
-            // Fake Network Delay (1.5 seconds) - C# server response time mimic karne ke liye
-            await new Promise(resolve => setTimeout(resolve, 1500));
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let recent=JSON.parse(localStorage.getItem("recent"))||[];
+let showIndex=0,selected=null;
 
-            loader.classList.add("hidden");
-            renderGames(backendData);
-        }
+function renderShowcase(){
+ showcase.innerHTML=showcaseGames.map(g=>`
+ <div class="showBox"><img src="${g.img}">
+ <b>${g.title}</b><p class="price">₹${g.price}</p></div>`).join("");
+ updateShowcase();
+}
+function updateShowcase(){showcase.style.transform=`translateX(-${showIndex*240}px)`;}
+function slideLeft(){if(showIndex>0)showIndex--;updateShowcase();}
+function slideRight(){if(showIndex<showcaseGames.length-1)showIndex++;updateShowcase();}
 
-        // --- 3. RENDER FUNCTION (Display Logic) ---
-        function renderGames(games) {
-            const container = document.getElementById("gamesContainer");
+function renderUpcoming(){
+ let html=upcomingGames.map(g=>`
+ <div class="glass p-2 w-[160px] shrink-0 mx-2">
+ <img src="${g.img}" class="h-24 w-full object-cover mb-1">
+ <small>${g.title} - ${g.date}</small></div>`).join("");
+ upcomingTrack.innerHTML=html+html;
+}
 
-            games.forEach(game => {
-                const card = `
-                <div class="glass-card rounded-xl overflow-hidden group relative">
-                    <div class="h-48 overflow-hidden relative">
-                        <img src="${game.img}" alt="${game.title}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
-                        <div class="absolute top-2 right-2 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-bold text-yellow-400 flex items-center gap-1">
-                            <i class="ri-star-fill"></i> ${game.rating}
-                        </div>
-                    </div>
+function renderRecent(){
+ recentBox.innerHTML=recent.map(p=>`
+ <div class="glass p-1"><img src="${p.img}" class="h-16 w-full object-cover">
+ <small>${p.title}</small></div>`).join("");
+}
 
-                    <div class="p-4">
-                        <div class="text-xs text-purple-400 font-bold mb-1 tracking-wide uppercase">${game.category}</div>
-                        <h3 class="text-xl font-bold text-white mb-2 truncate">${game.title}</h3>
-                        
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-2xl font-bold text-green-400 font-[Orbitron]">₹${game.price}</span>
-                            <button onclick="buyGame('${game.title}', ${game.price})" class="bg-white text-black hover:bg-purple-500 hover:text-white transition rounded-full w-10 h-10 flex items-center justify-center font-bold">
-                                <i class="ri-shopping-cart-2-fill text-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-                container.innerHTML += card;
-            });
-        }
+const productsDiv=document.getElementById("products");
+function render(){
+ let f=[...products];
+ if(search.value)f=f.filter(p=>p.title.toLowerCase().includes(search.value.toLowerCase()));
+ if(minP.value)f=f.filter(p=>p.price>=+minP.value);
+ if(maxP.value)f=f.filter(p=>p.price<=+maxP.value);
+ productsDiv.innerHTML=f.map(p=>{
+ let off=p.old?Math.round((1-p.price/p.old)*100):0;
+ return `<div class="card">
+ <img src="${p.img}" class="w-full h-36 object-cover">
+ <div class="p-2">
+ <div>${p.title}</div>
+ ${p.old?`<div><span class="discount">-${off}%</span> <span class="old">₹${p.old}</span></div>`:""}
+ <div class="price">₹${p.price}</div>
+ <button class="btn w-full py-2 mt-2" onclick="openModal(${p.id})">VIEW</button>
+ </div></div>`}).join("");
+}
 
-        // --- 4. BUY LOGIC ---
-        function buyGame(title, price) {
-            // C# Backend pe order bhej sakte hain
-            const msg = `System Alert:\nProcessing Order for ${title} (₹${price})...\nConnecting to Payment Gateway...`;
-            alert(msg);
-            
-            // Real life mein yaha: window.location.href = "/Checkout/Process?id=..."
-        }
+function openModal(id){
+ selected=products.find(x=>x.id==id);
+ mTitle.innerText=selected.title;
+ mPrice.innerText="₹"+selected.price;
+ mVideo.src=selected.video||"";
+ mAdd.onclick=()=>{addCart(selected.id);closeModal();}
+ mBuy.onclick=()=>{buyNow(selected);}
+ saveRecent(selected);
+ modal.classList.remove("hidden");
+}
+function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-        function scrollToGames() {
-            document.getElementById("gamesContainer").scrollIntoView({ behavior: 'smooth' });
-        }
+function addCart(id){
+ let p=products.find(x=>x.id==id);
+ let f=cart.find(x=>x.id==id);
+ if(f)f.qty++; else cart.push({...p,qty:1});
+ saveCart();
+}
+function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));renderCart();}
+function renderCart(){
+ cartCount.innerText=cart.length;
+ let t=0;
+ cartItems.innerHTML=cart.map(i=>{
+ t+=i.price*i.qty;
+ return `<div>${i.title} x${i.qty} = ₹${i.price*i.qty}</div>`}).join("")||"Cart Empty";
+ total.innerText=t;
+}
+function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-        // Page load hote hi games load karo
-        fetchGamesFromBackend();
+function saveRecent(p){
+ recent=[p,...recent.filter(x=>x.id!=p.id)].slice(0,6);
+ localStorage.setItem("recent",JSON.stringify(recent));
+ renderRecent();
+}
 
-    </script>
+function checkout(){
+ if(!cart.length)return;
+ let msg="I want to buy:\n",t=0;
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty} = ₹${i.price*i.qty}\n`;t+=i.price*i.qty;});
+ msg+=`Total = ₹${t}`;
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+}
+function buyNow(p){
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(`I want to buy ${p.title} for ₹${p.price}`));
+}
+
+renderShowcase();
+renderUpcoming();
+render();
+renderCart();
+renderRecent();
+</script>
 </body>
 </html>
