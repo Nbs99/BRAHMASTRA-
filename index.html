@@ -21,10 +21,13 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
 .showcase-wrapper:hover .showcase-track{animation-play-state:paused}
 .showBox{width:220px;background:#111827;border-radius:12px;padding:10px;flex-shrink:0}
 .showBox img{height:160px;width:100%;object-fit:cover;border-radius:8px}
+.upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header class="flex justify-between items-center p-4 sticky top-0 bg-black/90 z-50 border-b border-gray-800">
   <div class="flex items-center gap-2">
     <div class="w-8 h-8 rounded bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
@@ -40,24 +43,39 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
 <section class="p-4">
   <h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
   <div class="overflow-hidden glass">
-    <div class="flex gap-4 animate-pulse p-3">
-      <img class="w-40 h-28 object-cover rounded" src="https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg">
-      <img class="w-40 h-28 object-cover rounded" src="https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg">
-      <img class="w-40 h-28 object-cover rounded" src="https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg">
-    </div>
+    <div id="upcoming" class="upcoming-track p-3 gap-4"></div>
   </div>
+</section>
+
+<!-- SEARCH -->
+<section class="p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
+  <input id="search" placeholder="Search game..." class="p-2 bg-black border border-gray-700 rounded">
+  <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border border-gray-700 rounded">
+  <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border border-gray-700 rounded">
+  <select id="sortBy" class="p-2 bg-black border border-gray-700 rounded">
+    <option value="">Sort</option>
+    <option value="price-asc">Low → High</option>
+    <option value="price-desc">High → Low</option>
+    <option value="name-asc">Name A-Z</option>
+  </select>
 </section>
 
 <!-- SHOWCASE -->
 <section class="p-4">
-  <h2 class="text-purple-400 font-semibold mb-2">🔥 Featured Games</h2>
+  <h2 class="text-purple-400 font-semibold mb-2">🔥 Featured</h2>
   <div class="overflow-hidden showcase-wrapper">
     <div id="showcase" class="showcase-track"></div>
   </div>
 </section>
 
+<!-- RECENT -->
+<section class="p-4">
+  <h2 class="text-green-400 font-semibold mb-2">👀 Recently Viewed</h2>
+  <div id="recentBox" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+</section>
+
 <!-- PRODUCTS -->
-<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-4"></main>
+<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-4 pb-20"></main>
 
 <!-- CART -->
 <aside id="cartBox" class="fixed top-0 right-0 w-72 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition z-50">
@@ -73,81 +91,143 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
   <div id="wishlistItems" class="space-y-2 text-sm"></div>
 </aside>
 
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-3" onclick="closeModal()">
+  <div class="bg-gray-900 p-4 rounded-xl max-w-md w-full" onclick="event.stopPropagation()">
+    <h2 id="mTitle" class="text-xl font-bold"></h2>
+    <iframe id="mVideo" class="w-full h-48 my-2"></iframe>
+    <p id="mPrice" class="price text-lg"></p>
+    <button id="mAdd" class="bg-purple-600 w-full py-2 mt-2 rounded">Add to Cart</button>
+    <button id="mBuy" class="bg-green-600 w-full py-2 mt-2 rounded">Buy Now</button>
+  </div>
+</div>
+
 <script>
+/* DATA */
 const products=[];
 for(let i=1;i<=50;i++){
   products.push({
     id:i,
     title:"Game "+i,
-    price:500+i*30,
+    price:500+i*40,
+    video:"https://www.youtube.com/embed/K0u_kAWLJOA",
     img:"https://picsum.photos/400?random="+i
   });
 }
 const showcaseGames=products.slice(0,20);
-let cart=[],wishlist=[];
+const upcomingGames=[
+  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
+  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+  {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
+];
 
+/* STATE */
+let cart=[],wishlist=[],recent=[],selected=null;
+
+/* UPCOMING */
+const up=document.getElementById("upcoming");
+const upHtml=upcomingGames.map(g=>`<div class="glass w-40 p-2"><img src="${g.img}" class="h-24 w-full object-cover rounded"><p class="text-xs mt-1">${g.title}</p></div>`).join("");
+up.innerHTML=upHtml+upHtml;
+
+/* SHOWCASE */
 const showcase=document.getElementById("showcase");
 function renderShowcase(){
-  const html=showcaseGames.map(g=>`
-    <button class="showBox" onclick="addCart(${g.id})">
-      <img src="${g.img}">
-      <div class="mt-1 font-semibold">${g.title}</div>
-      <div class="price">₹${g.price}</div>
-    </button>`).join("");
-  showcase.innerHTML=html+html; // infinite loop
+ const h=showcaseGames.map(g=>`
+  <button class="showBox" onclick="openModal(${g.id})">
+   <img src="${g.img}">
+   <div>${g.title}</div>
+   <div class="price">₹${g.price}</div>
+  </button>`).join("");
+ showcase.innerHTML=h+h;
 }
 renderShowcase();
 
+/* SEARCH & PRODUCTS */
 const productsDiv=document.getElementById("products");
-function renderProducts(){
-  productsDiv.innerHTML=products.map(p=>`
-    <div class="card">
-      <img src="${p.img}" class="h-48 w-full object-cover">
-      <div class="p-2">
-        <div class="font-semibold text-sm">${p.title}</div>
-        <div class="price">₹${p.price}</div>
-        <button class="bg-purple-600 w-full mt-1 py-1 rounded" onclick="addCart(${p.id})">Add</button>
-        <button class="text-pink-400 text-xs mt-1" onclick="toggleWish(${p.id})">♡</button>
-      </div>
-    </div>`).join("");
+function render(){
+ let f=[...products];
+ const q=search.value.toLowerCase();
+ if(q) f=f.filter(p=>p.title.toLowerCase().includes(q));
+ if(minP.value) f=f.filter(p=>p.price>=minP.value);
+ if(maxP.value) f=f.filter(p=>p.price<=maxP.value);
+ if(sortBy.value==="price-asc") f.sort((a,b)=>a.price-b.price);
+ if(sortBy.value==="price-desc") f.sort((a,b)=>b.price-a.price);
+ if(sortBy.value==="name-asc") f.sort((a,b)=>a.title.localeCompare(b.title));
+ productsDiv.innerHTML=f.map(p=>`
+  <div class="card">
+   <img src="${p.img}" class="h-48 w-full object-cover">
+   <div class="p-2">
+    <div>${p.title}</div>
+    <div class="price">₹${p.price}</div>
+    <button class="bg-purple-600 w-full mt-1 py-1 rounded" onclick="addCart(${p.id})">Add</button>
+    <button class="text-pink-400 text-xs mt-1" onclick="toggleWish(${p.id})">♡</button>
+   </div>
+  </div>`).join("");
 }
-renderProducts();
+render();
+search.oninput=minP.oninput=maxP.oninput=render;
+sortBy.onchange=render;
 
+/* MODAL */
+function openModal(id){
+ selected=products.find(x=>x.id===id);
+ mTitle.innerText=selected.title;
+ mPrice.innerText="₹"+selected.price;
+ mVideo.src=selected.video;
+ mAdd.onclick=()=>addCart(id);
+ mBuy.onclick=()=>buyNow(selected);
+ modal.classList.remove("hidden");
+ saveRecent(selected);
+}
+function closeModal(){modal.classList.add("hidden");mVideo.src=""}
+
+/* RECENT */
+function saveRecent(p){
+ recent=[p,...recent.filter(x=>x.id!==p.id)].slice(0,6);
+ recentBox.innerHTML=recent.map(r=>`<img src="${r.img}" class="h-20 w-full object-cover rounded">`).join("");
+}
+
+/* CART */
 function addCart(id){
-  const p=products.find(x=>x.id===id);
-  const f=cart.find(x=>x.id===id);
-  if(f)f.qty++; else cart.push({...p,qty:1});
-  renderCart();
+ const p=products.find(x=>x.id===id);
+ const f=cart.find(x=>x.id===id);
+ if(f)f.qty++; else cart.push({...p,qty:1});
+ renderCart();
 }
 function renderCart(){
-  document.getElementById("cartCount").innerText=cart.reduce((s,i)=>s+i.qty,0);
-  let t=0;
-  cartItems.innerHTML=cart.map(i=>{
-    const lt=i.price*i.qty; t+=lt;
-    return `<div>${i.title} x${i.qty} = ₹${lt}</div>`;
-  }).join("");
-  total.innerText=t;
+ cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
+ let t=0;
+ cartItems.innerHTML=cart.map(i=>{
+  const lt=i.price*i.qty; t+=lt;
+  return `<div>${i.title} x${i.qty} = ₹${lt}</div>`;
+ }).join("");
+ total.innerText=t;
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full")}
 
+/* WISHLIST */
 function toggleWish(id){
-  const f=wishlist.find(x=>x.id===id);
-  if(f)wishlist=wishlist.filter(x=>x.id!==id);
-  else wishlist.push(products.find(x=>x.id===id));
-  renderWish();
+ const f=wishlist.find(x=>x.id===id);
+ if(f)wishlist=wishlist.filter(x=>x.id!==id);
+ else wishlist.push(products.find(x=>x.id===id));
+ renderWish();
 }
 function renderWish(){
-  wishCount.innerText=wishlist.length;
-  wishlistItems.innerHTML=wishlist.map(w=>`<div>${w.title} - ₹${w.price}</div>`).join("");
+ wishCount.innerText=wishlist.length;
+ wishlistItems.innerHTML=wishlist.map(w=>`<div>${w.title} - ₹${w.price}</div>`).join("");
 }
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full")}
 
+/* CHECKOUT */
 function checkout(){
-  if(!cart.length)return;
-  let msg="Order:\n";let t=0;
-  cart.forEach((i,n)=>{const lt=i.price*i.qty; t+=lt; msg+=`${n+1}. ${i.title} x${i.qty} = ₹${lt}\n`;});
-  msg+="Total ₹"+t;
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+ if(!cart.length)return;
+ let msg="Order:\n";let t=0;
+ cart.forEach((i,n)=>{const lt=i.price*i.qty; t+=lt; msg+=`${n+1}. ${i.title} x${i.qty} = ₹${lt}\n`;});
+ msg+="Total ₹"+t;
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+}
+function buyNow(p){
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(`Buy ${p.title} for ₹${p.price}`));
 }
 </script>
 </body>
