@@ -6,221 +6,524 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+
 <style>
-body{background:#0b0b10;color:white;font-family:Segoe UI}
-.card{background:#0f1218;border:1px solid #1f2430;transition:.3s;position:relative}
-.card:hover{transform:translateY(-5px)}
-.discount{background:#b91c1c;padding:4px 8px;font-size:12px;font-weight:bold}
-.old{color:#888;text-decoration:line-through;font-size:13px}
-.price{color:#22c55e;font-size:20px;font-weight:bold}
-.btn{background:#2a2f3a;color:#ccc}
-.btn:hover{background:#3b4252;color:white}
-.glass{background:rgba(20,20,30,.7);backdrop-filter:blur(10px)}
-.upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
-@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  body {
+    background:#0b0b10;
+    color:#f9fafb;
+    font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
 
-/* Showcase box responsive */
-.showBox{width:160px;background:#111;border-radius:12px;padding:10px;flex-shrink:0}
-.showBox img{height:120px;width:100%;object-fit:cover;border-radius:8px}
-@media(min-width:640px){.showBox{width:200px}.showBox img{height:140px}}
-@media(min-width:1024px){.showBox{width:240px}.showBox img{height:160px}}
+  .card {
+    background:#0f1218;
+    border:1px solid #1f2430;
+    transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    position:relative;
+    border-radius:0.75rem;
+    overflow:hidden;
+  }
+  .card:hover {
+    transform:translateY(-4px);
+    border-color:#4b5563;
+    box-shadow:0 15px 35px rgba(0,0,0,0.6);
+  }
 
-/* Gamer Logo */
-.logoText{
- font-family:'Orbitron',sans-serif;
- font-size:26px;
- letter-spacing:2px;
- background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
- -webkit-background-clip:text;
- -webkit-text-fill-color:transparent;
- text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
-}
+  .discount {
+    background:#b91c1c;
+    padding:2px 8px;
+    font-size:11px;
+    font-weight:600;
+    border-radius:999px;
+  }
+  .old {
+    color:#9ca3af;
+    text-decoration:line-through;
+    font-size:13px;
+  }
+  .price {
+    color:#22c55e;
+    font-size:20px;
+    font-weight:700;
+  }
+  .btn {
+    background:#111827;
+    color:#d1d5db;
+    border-radius:0.5rem;
+  }
+  .btn:hover {
+    background:#1f2937;
+    color:#f9fafb;
+  }
+
+  .glass {
+    background:rgba(17,24,39,.8);
+    backdrop-filter:blur(10px);
+    border-radius:0.75rem;
+    border:1px solid rgba(55,65,81,.7);
+  }
+
+  .upcoming-track {
+    display:flex;
+    width:max-content;
+    animation:scroll 25s linear infinite;
+  }
+  @keyframes scroll {
+    from { transform:translateX(0); }
+    to   { transform:translateX(-50%); }
+  }
+
+  .showBox {
+    width:160px;
+    background:#111827;
+    border-radius:12px;
+    padding:10px;
+    flex-shrink:0;
+  }
+  .showBox img {
+    height:120px;
+    width:100%;
+    object-fit:cover;
+    border-radius:8px;
+  }
+  @media (min-width:640px) {
+    .showBox { width:200px; }
+    .showBox img { height:140px; }
+  }
+  @media (min-width:1024px) {
+    .showBox { width:240px; }
+    .showBox img { height:160px; }
+  }
+
+  .logoText {
+    font-family:'Orbitron',sans-serif;
+    font-size:26px;
+    letter-spacing:2px;
+    background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
+  }
+
+  /* Better modal scroll handling on mobile */
+  #modalInner {
+    max-height:90vh;
+    overflow-y:auto;
+  }
+
+  /* Hide number input spinners (Chrome) */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance:none;
+    margin:0;
+  }
+  input[type=number] {
+    -moz-appearance:textfield;
+  }
 </style>
 </head>
-<body>
+<body class="min-h-screen">
 
 <!-- NAV -->
-<div class="bg-black flex justify-between items-center px-4 py-3 sticky top-0 z-50">
- <div class="logoText">BRAHMASTRA</div>
- <div onclick="toggleCart()">🛒 <span id="cartCount">0</span></div>
-</div>
+<header class="bg-black/90 backdrop-blur flex justify-between items-center px-4 py-3 sticky top-0 z-50 border-b border-gray-800">
+  <div class="flex items-center gap-2">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
+    <div class="logoText">BRAHMASTRA</div>
+  </div>
+  <button onclick="toggleCart()" class="relative flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-900 hover:bg-gray-800">
+    <span class="text-lg">🛒</span>
+    <span class="text-sm">Cart</span>
+    <span class="absolute -top-1 -right-1 bg-green-500 text-black text-xs font-bold rounded-full px-1.5 py-0.5" id="cartCount">0</span>
+  </button>
+</header>
 
 <!-- UPCOMING (TOP) -->
-<div class="p-4 overflow-hidden">
- <h2 class="text-yellow-400 font-bold mb-2">⏳ Upcoming</h2>
- <div class="overflow-hidden">
-  <div id="upcomingTrack" class="upcoming-track"></div>
- </div>
-</div>
+<section class="p-4 overflow-hidden">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-yellow-400 font-semibold tracking-wide">⏳ Upcoming Releases</h2>
+    <span class="text-xs text-gray-400">Auto scrolling showcase</span>
+  </div>
+  <div class="overflow-hidden rounded-xl border border-gray-800 bg-gradient-to-r from-gray-900/70 via-black to-gray-900/70">
+    <div id="upcomingTrack" class="upcoming-track py-3 px-2"></div>
+  </div>
+</section>
 
 <!-- SEARCH / FILTER -->
-<div class="p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
- <input id="search" placeholder="Search game..." class="p-2 bg-black border">
- <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border">
- <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border">
- <button onclick="render()" class="bg-purple-600 p-2">Apply</button>
-</div>
+<section class="p-3 border-y border-gray-900 bg-black/50">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+    <input id="search" placeholder="Search game..." class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
+    <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
+    <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
+    <button onclick="render()" class="bg-purple-600 hover:bg-purple-700 p-2 rounded-md text-sm font-semibold">Apply Filters</button>
+  </div>
+</section>
 
 <!-- SHOWCASE -->
-<div class="p-4 relative">
- <h2 class="text-purple-400 font-bold mb-2">🔥 Featured</h2>
- <button onclick="slideLeft()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">◀</button>
- <button onclick="slideRight()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">▶</button>
- <div class="overflow-hidden">
-  <div id="showcase" class="flex gap-4 transition-all duration-500"></div>
- </div>
-</div>
+<section class="p-4 relative">
+  <div class="flex items-center justify-between mb-2">
+    <h2 class="text-purple-400 font-semibold tracking-wide">🔥 Featured</h2>
+    <span class="text-xs text-gray-400">Swipe or use arrows</span>
+  </div>
+  <button onclick="slideLeft()" aria-label="Previous" class="hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 px-3 py-2 rounded-full border border-gray-800 z-10">◀</button>
+  <button onclick="slideRight()" aria-label="Next" class="hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 px-3 py-2 rounded-full border border-gray-800 z-10">▶</button>
+  <div class="overflow-hidden">
+    <div id="showcase" class="flex gap-4 transition-transform duration-500 will-change-transform"></div>
+  </div>
+</section>
 
 <!-- RECENT -->
-<div class="p-4">
- <h2 class="text-green-400 font-bold mb-2">👀 Recently Viewed</h2>
- <div id="recentBox" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2"></div>
-</div>
+<section class="p-4">
+  <h2 class="text-green-400 font-semibold tracking-wide mb-2">👀 Recently Viewed</h2>
+  <div id="recentBox" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 min-h-[4rem]"></div>
+</section>
 
 <!-- PRODUCTS -->
-<div id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3"></div>
+<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3 pb-16"></main>
 
 <!-- CART -->
-<div id="cartBox" class="fixed top-0 right-0 w-[320px] h-full bg-black p-4 translate-x-full transition z-50">
- <button onclick="toggleCart()">Close</button>
- <div id="cartItems" class="mt-2"></div>
- <p class="mt-2 font-bold">Total: ₹<span id="total">0</span></p>
- <button onclick="checkout()" class="bg-green-600 w-full p-2 mt-2">Checkout WhatsApp</button>
-</div>
+<aside id="cartBox" class="fixed top-0 right-0 w-[320px] max-w-[80vw] h-full bg-[#050509] border-l border-gray-800 p-4 translate-x-full transition-transform duration-300 z-50 flex flex-col">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="font-semibold text-lg">Your Cart</h3>
+    <button onclick="toggleCart()" class="text-gray-400 hover:text-gray-200 text-xl leading-none">✖</button>
+  </div>
+  <div id="cartItems" class="mt-2 flex-1 overflow-y-auto text-sm space-y-2 pr-1"></div>
+  <div class="pt-3 border-t border-gray-800 mt-3">
+    <p class="font-bold text-base mb-2 flex justify-between">
+      <span>Total:</span>
+      <span>₹<span id="total">0</span></span>
+    </p>
+    <button onclick="checkout()" class="bg-green-600 hover:bg-green-700 w-full p-2 rounded-md font-semibold text-sm">Checkout via WhatsApp</button>
+  </div>
+</aside>
 
 <!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center" onclick="closeModal()">
- <div class="bg-[#15151a] w-full max-w-lg rounded-xl p-4" onclick="event.stopPropagation()">
-  <button onclick="closeModal()" class="float-right text-xl">✖</button>
-  <iframe id="mVideo" class="w-full h-40 sm:h-56 md:h-64 mb-3"></iframe>
-  <h2 id="mTitle" class="text-2xl font-bold"></h2>
-  <p id="mPrice" class="text-green-400 text-xl font-bold my-2"></p>
-  <div class="grid grid-cols-2 gap-3 mt-3">
-   <button id="mAdd" class="bg-purple-600 py-3 rounded text-lg font-bold">Add to Cart</button>
-   <button id="mBuy" class="bg-green-600 py-3 rounded text-lg font-bold">Buy Now</button>
+<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center px-3" onclick="closeModal()">
+  <div id="modalInner" class="bg-[#101018] w-full max-w-lg rounded-xl p-4 shadow-2xl border border-gray-800" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-start mb-3">
+      <h2 id="mTitle" class="text-2xl font-bold leading-tight"></h2>
+      <button onclick="closeModal()" class="text-gray-400 hover:text-gray-200 text-xl">✖</button>
+    </div>
+    <div class="rounded-lg overflow-hidden mb-3 bg-black">
+      <iframe id="mVideo" class="w-full h-40 sm:h-56 md:h-64" allowfullscreen loading="lazy" title="Game trailer"></iframe>
+    </div>
+    <p id="mPrice" class="text-green-400 text-xl font-bold my-2"></p>
+    <div class="grid grid-cols-2 gap-3 mt-3">
+      <button id="mAdd" class="bg-purple-600 hover:bg-purple-700 py-3 rounded-lg text-base font-semibold">Add to Cart</button>
+      <button id="mBuy" class="bg-green-600 hover:bg-green-700 py-3 rounded-lg text-base font-semibold">Buy Now</button>
+    </div>
   </div>
- </div>
 </div>
 
 <script>
-let products=[
-{id:1,title:"Resident Evil Requiem",price:3607,old:4399,video:"https://www.youtube.com/embed/K0u_kAWLJOA",img:"https://wallpapers.com/images/hd/resident-evil-4-remake-leon-4k-9m1u8u5j7f5k4wvn.jpg"},
-{id:2,title:"Reanimal Deluxe",price:2160,old:2400,video:"https://www.youtube.com/embed/dQw4w9WgXcQ",img:"https://wallpapers.com/images/hd/dark-fantasy-game-wallpaper-4k-5m3xtq8x3x2mzyaw.jpg"},
-{id:3,title:"Core Keeper",price:899,old:0,video:"",img:"https://wallpapers.com/images/hd/core-keeper-game-art-4k-w8jvhc6iydk8m2ts.jpg"},
-{id:4,title:"Alice VR",price:1299,old:0,video:"",img:"https://wallpapers.com/images/hd/vr-game-desert-landscape-4k-2p0z47d6jq7c5qj0.jpg"}
-];
-while(products.length<40){
- let i=products.length+1;
- products.push({id:i,title:"Demo Game "+i,price:500+i*40,old:0,
- video:"https://www.youtube.com/embed/dQw4w9WgXcQ",
- img:"https://picsum.photos/400?random="+i});
-}
+  // ---------- DATA ----------
+  const products = [
+    {id:1,title:"Resident Evil Requiem",price:3607,old:4399,video:"https://www.youtube.com/embed/K0u_kAWLJOA",img:"https://wallpapers.com/images/hd/resident-evil-4-remake-leon-4k-9m1u8u5j7f5k4wvn.jpg"},
+    {id:2,title:"Reanimal Deluxe",price:2160,old:2400,video:"https://www.youtube.com/embed/dQw4w9WgXcQ",img:"https://wallpapers.com/images/hd/dark-fantasy-game-wallpaper-4k-5m3xtq8x3x2mzyaw.jpg"},
+    {id:3,title:"Core Keeper",price:899,old:0,video:"",img:"https://wallpapers.com/images/hd/core-keeper-game-art-4k-w8jvhc6iydk8m2ts.jpg"},
+    {id:4,title:"Alice VR",price:1299,old:0,video:"",img:"https://wallpapers.com/images/hd/vr-game-desert-landscape-4k-2p0z47d6jq7c5qj0.jpg"}
+  ];
 
-let showcaseGames=products.slice(0,6);
-let upcomingGames=[
-{title:"GTA VI",date:"2025",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
-{title:"Witcher 4",date:"2025",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
-{title:"Far Cry 7",date:"2025",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
-];
+  // Fill demo games up to 40
+  while (products.length < 40) {
+    const i = products.length + 1;
+    products.push({
+      id:i,
+      title:"Demo Game " + i,
+      price:500 + i * 40,
+      old:0,
+      video:"https://www.youtube.com/embed/dQw4w9WgXcQ",
+      img:"https://picsum.photos/400?random=" + i
+    });
+  }
 
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
-let recent=JSON.parse(localStorage.getItem("recent"))||[];
-let showIndex=0,selected=null;
+  const showcaseGames = products.slice(0, 6);
+  const upcomingGames = [
+    {title:"GTA VI",date:"2025",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
+    {title:"Witcher 4",date:"2025",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+    {title:"Far Cry 7",date:"2025",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
+  ];
 
-function renderShowcase(){
- showcase.innerHTML=showcaseGames.map(g=>`
- <div class="showBox"><img src="${g.img}">
- <b>${g.title}</b><p class="price">₹${g.price}</p></div>`).join("");
- updateShowcase();
-}
-function updateShowcase(){showcase.style.transform=`translateX(-${showIndex*240}px)`;}
-function slideLeft(){if(showIndex>0)showIndex--;updateShowcase();}
-function slideRight(){if(showIndex<showcaseGames.length-1)showIndex++;updateShowcase();}
+  // ---------- STATE ----------
+  let cart = [];
+  let recent = [];
+  let showIndex = 0;
+  let selected = null;
 
-function renderUpcoming(){
- let html=upcomingGames.map(g=>`
- <div class="glass p-2 w-[160px] shrink-0 mx-2">
- <img src="${g.img}" class="h-24 w-full object-cover mb-1">
- <small>${g.title} - ${g.date}</small></div>`).join("");
- upcomingTrack.innerHTML=html+html;
-}
+  // Safe localStorage helpers (avoid crashes in private mode etc.)
+  function loadLocal(key, fallback) {
+    try {
+      const v = localStorage.getItem(key);
+      return v ? JSON.parse(v) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+  function saveLocal(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // ignore
+    }
+  }
 
-function renderRecent(){
- recentBox.innerHTML=recent.map(p=>`
- <div class="glass p-1"><img src="${p.img}" class="h-16 w-full object-cover">
- <small>${p.title}</small></div>`).join("");
-}
+  cart = loadLocal("cart", []);
+  recent = loadLocal("recent", []);
 
-const productsDiv=document.getElementById("products");
-function render(){
- let f=[...products];
- if(search.value)f=f.filter(p=>p.title.toLowerCase().includes(search.value.toLowerCase()));
- if(minP.value)f=f.filter(p=>p.price>=+minP.value);
- if(maxP.value)f=f.filter(p=>p.price<=+maxP.value);
- productsDiv.innerHTML=f.map(p=>{
- let off=p.old?Math.round((1-p.price/p.old)*100):0;
- return `<div class="card">
- <img src="${p.img}" class="w-full h-36 object-cover">
- <div class="p-2">
- <div>${p.title}</div>
- ${p.old?`<div><span class="discount">-${off}%</span> <span class="old">₹${p.old}</span></div>`:""}
- <div class="price">₹${p.price}</div>
- <button class="btn w-full py-2 mt-2" onclick="openModal(${p.id})">VIEW</button>
- </div></div>`}).join("");
-}
+  // ---------- ELEMENTS ----------
+  const showcase = document.getElementById("showcase");
+  const upcomingTrack = document.getElementById("upcomingTrack");
+  const recentBox = document.getElementById("recentBox");
+  const productsDiv = document.getElementById("products");
+  const cartCount = document.getElementById("cartCount");
+  const cartItems = document.getElementById("cartItems");
+  const totalEl = document.getElementById("total");
+  const cartBox = document.getElementById("cartBox");
+  const modal = document.getElementById("modal");
+  const mTitle = document.getElementById("mTitle");
+  const mPrice = document.getElementById("mPrice");
+  const mVideo = document.getElementById("mVideo");
+  const mAdd = document.getElementById("mAdd");
+  const mBuy = document.getElementById("mBuy");
+  const search = document.getElementById("search");
+  const minP = document.getElementById("minP");
+  const maxP = document.getElementById("maxP");
 
-function openModal(id){
- selected=products.find(x=>x.id==id);
- mTitle.innerText=selected.title;
- mPrice.innerText="₹"+selected.price;
- mVideo.src=selected.video||"";
- mAdd.onclick=()=>{addCart(selected.id);closeModal();}
- mBuy.onclick=()=>{buyNow(selected);}
- saveRecent(selected);
- modal.classList.remove("hidden");
-}
-function closeModal(){modal.classList.add("hidden");mVideo.src="";}
+  // ---------- SHOWCASE ----------
+  function renderShowcase() {
+    showcase.innerHTML = showcaseGames.map(g => `
+      <button class="showBox text-left hover:ring-2 hover:ring-purple-500/60 transition shadow-sm hover:shadow-lg" onclick="openModal(${g.id})">
+        <img src="${g.img}" alt="${g.title}">
+        <div class="mt-2 text-sm font-semibold line-clamp-2">${g.title}</div>
+        <div class="price mt-1">₹${g.price}</div>
+      </button>
+    `).join("");
+    updateShowcase();
+  }
+  function updateShowcase() {
+    showcase.style.transform = `translateX(-${showIndex * 240}px)`;
+  }
+  function slideLeft() {
+    if (showIndex > 0) {
+      showIndex--;
+      updateShowcase();
+    }
+  }
+  function slideRight() {
+    if (showIndex < showcaseGames.length - 1) {
+      showIndex++;
+      updateShowcase();
+    }
+  }
+  window.slideLeft = slideLeft;
+  window.slideRight = slideRight;
 
-function addCart(id){
- let p=products.find(x=>x.id==id);
- let f=cart.find(x=>x.id==id);
- if(f)f.qty++; else cart.push({...p,qty:1});
- saveCart();
-}
-function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));renderCart();}
-function renderCart(){
- cartCount.innerText=cart.length;
- let t=0;
- cartItems.innerHTML=cart.map(i=>{
- t+=i.price*i.qty;
- return `<div>${i.title} x${i.qty} = ₹${i.price*i.qty}</div>`}).join("")||"Cart Empty";
- total.innerText=t;
-}
-function toggleCart(){cartBox.classList.toggle("translate-x-full");}
+  // ---------- UPCOMING ----------
+  function renderUpcoming() {
+    const html = upcomingGames.map(g => `
+      <div class="glass p-2 w-[160px] shrink-0 mx-2 flex flex-col">
+        <div class="relative">
+          <img src="${g.img}" alt="${g.title}" class="h-24 w-full object-cover rounded-md mb-1">
+          <span class="absolute bottom-1 right-1 text-[10px] bg-black/70 px-1.5 py-0.5 rounded-full text-gray-100">Coming ${g.date}</span>
+        </div>
+        <small class="text-xs font-semibold mt-1">${g.title}</small>
+      </div>
+    `).join("");
+    upcomingTrack.innerHTML = html + html;
+  }
 
-function saveRecent(p){
- recent=[p,...recent.filter(x=>x.id!=p.id)].slice(0,6);
- localStorage.setItem("recent",JSON.stringify(recent));
- renderRecent();
-}
+  // ---------- RECENT ----------
+  function renderRecent() {
+    if (!recent.length) {
+      recentBox.innerHTML = `<p class="text-xs text-gray-500 col-span-full">No games viewed yet.</p>`;
+      return;
+    }
+    recentBox.innerHTML = recent.map(p => `
+      <button class="glass p-1 text-left hover:ring-1 hover:ring-green-500/50" onclick="openModal(${p.id})">
+        <img src="${p.img}" alt="${p.title}" class="h-16 w-full object-cover rounded-md">
+        <small class="text-[11px] mt-1 line-clamp-2 block">${p.title}</small>
+      </button>
+    `).join("");
+  }
 
-function checkout(){
- if(!cart.length)return;
- let msg="I want to buy:\n",t=0;
- cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty} = ₹${i.price*i.qty}\n`;t+=i.price*i.qty;});
- msg+=`Total = ₹${t}`;
- window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
-}
-function buyNow(p){
- window.open("https://wa.me/919313339081?text="+encodeURIComponent(`I want to buy ${p.title} for ₹${p.price}`));
-}
+  function saveRecent(p) {
+    recent = [p, ...recent.filter(x => x.id !== p.id)].slice(0, 6);
+    saveLocal("recent", recent);
+    renderRecent();
+  }
 
-renderShowcase();
-renderUpcoming();
-render();
-renderCart();
-renderRecent();
+  // ---------- PRODUCTS ----------
+  function render() {
+    let f = [...products];
+    const q = search.value.trim().toLowerCase();
+    const minVal = minP.value ? Number(minP.value) : null;
+    const maxVal = maxP.value ? Number(maxP.value) : null;
+
+    if (q) {
+      f = f.filter(p => p.title.toLowerCase().includes(q));
+    }
+    if (minVal !== null && !isNaN(minVal)) {
+      f = f.filter(p => p.price >= minVal);
+    }
+    if (maxVal !== null && !isNaN(maxVal)) {
+      f = f.filter(p => p.price <= maxVal);
+    }
+
+    if (!f.length) {
+      productsDiv.innerHTML = `<p class="col-span-full text-center text-sm text-gray-500 py-8">No games found. Try different filters.</p>`;
+      return;
+    }
+
+    productsDiv.innerHTML = f.map(p => {
+      const off = p.old ? Math.round((1 - p.price / p.old) * 100) : 0;
+      return `
+        <div class="card">
+          <button class="block w-full" onclick="openModal(${p.id})">
+            <img src="${p.img}" alt="${p.title}" class="w-full h-36 object-cover">
+          </button>
+          <div class="p-2 space-y-1">
+            <div class="text-sm font-semibold line-clamp-2 min-h-[2.5rem]">${p.title}</div>
+            ${p.old ? `
+              <div class="flex items-center justify-between text-xs mt-1">
+                <span class="discount">-${off}%</span>
+                <span class="old">₹${p.old}</span>
+              </div>` : `<div class="h-5"></div>`}
+            <div class="flex items-center justify-between mt-1">
+              <div class="price">₹${p.price}</div>
+              <button class="text-xs text-purple-300 hover:text-purple-100 underline" onclick="event.stopPropagation(); addCart(${p.id});">Add</button>
+            </div>
+            <button class="btn w-full py-2 mt-2 text-sm font-semibold" onclick="openModal(${p.id})">View Details</button>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  // Live filter on typing (debounced)
+  let filterTimer;
+  [search, minP, maxP].forEach(inp => {
+    inp.addEventListener("input", () => {
+      clearTimeout(filterTimer);
+      filterTimer = setTimeout(render, 200);
+    });
+  });
+
+  // ---------- MODAL ----------
+  function openModal(id) {
+    selected = products.find(x => x.id === id);
+    if (!selected) return;
+
+    mTitle.innerText = selected.title;
+    mPrice.innerText = "₹" + selected.price;
+    mVideo.src = selected.video || "";
+    mAdd.onclick = () => { addCart(selected.id); closeModal(); };
+    mBuy.onclick = () => { buyNow(selected); };
+    saveRecent(selected);
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal() {
+    modal.classList.add("hidden");
+    mVideo.src = "";
+    document.body.style.overflow = "";
+  }
+  window.openModal = openModal;
+  window.closeModal = closeModal;
+
+  // ---------- CART ----------
+  function addCart(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    const found = cart.find(x => x.id === id);
+    if (found) {
+      found.qty += 1;
+    } else {
+      cart.push({...p, qty:1});
+    }
+    saveCart();
+  }
+
+  function changeQty(id, delta) {
+    const item = cart.find(x => x.id === id);
+    if (!item) return;
+    item.qty += delta;
+    if (item.qty <= 0) {
+      cart = cart.filter(x => x.id !== id);
+    }
+    saveCart();
+  }
+
+  function removeItem(id) {
+    cart = cart.filter(x => x.id !== id);
+    saveCart();
+  }
+
+  function saveCart() {
+    saveLocal("cart", cart);
+    renderCart();
+  }
+
+  function renderCart() {
+    cartCount.innerText = cart.reduce((sum, item) => sum + item.qty, 0);
+    if (!cart.length) {
+      cartItems.innerHTML = `<p class="text-xs text-gray-500">Your cart is empty.</p>`;
+      totalEl.innerText = "0";
+      return;
+    }
+    let t = 0;
+    cartItems.innerHTML = cart.map(i => {
+      const lineTotal = i.price * i.qty;
+      t += lineTotal;
+      return `
+        <div class="flex items-center justify-between bg-gray-900/70 rounded-md px-2 py-1.5">
+          <div class="flex-1 mr-2">
+            <p class="text-xs font-semibold line-clamp-2">${i.title}</p>
+            <p class="text-[11px] text-gray-400">₹${i.price} × ${i.qty} = <span class="text-gray-100">₹${lineTotal}</span></p>
+          </div>
+          <div class="flex items-center gap-1">
+            <button class="w-6 h-6 rounded-full bg-gray-800 text-xs" onclick="changeQty(${i.id}, -1)">-</button>
+            <button class="w-6 h-6 rounded-full bg-gray-800 text-xs" onclick="changeQty(${i.id}, 1)">+</button>
+            <button class="w-7 h-7 rounded-full bg-red-600 text-xs" onclick="removeItem(${i.id})">✕</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+    totalEl.innerText = t;
+  }
+
+  function toggleCart() {
+    cartBox.classList.toggle("translate-x-full");
+  }
+  window.toggleCart = toggleCart;
+  window.addCart = addCart;
+  window.changeQty = changeQty;
+  window.removeItem = removeItem;
+
+  // ---------- CHECKOUT ----------
+  function checkout() {
+    if (!cart.length) return;
+    let msg = "I want to buy:\n";
+    let t = 0;
+    cart.forEach((i, n) => {
+      const line = i.price * i.qty;
+      msg += `${n + 1}. ${i.title} x${i.qty} = ₹${line}\n`;
+      t += line;
+    });
+    msg += `Total = ₹${t}`;
+    window.open("https://wa.me/919313339081?text=" + encodeURIComponent(msg), "_blank");
+  }
+  function buyNow(p) {
+    const msg = `I want to buy ${p.title} for ₹${p.price}`;
+    window.open("https://wa.me/919313339081?text=" + encodeURIComponent(msg), "_blank");
+  }
+  window.checkout = checkout;
+  window.buyNow = buyNow;
+
+  // ---------- INIT ----------
+  renderShowcase();
+  renderUpcoming();
+  render();
+  renderCart();
+  renderRecent();
 </script>
 </body>
 </html>
+
 
