@@ -6,10 +6,7 @@
 <title>Brahmastra Gaming Store</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Gamer Font -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-
 <style>
 body{background:#0b0b10;color:white;font-family:Segoe UI}
 .card{background:#0f1218;border:1px solid #1f2430;transition:.3s;position:relative}
@@ -20,20 +17,24 @@ body{background:#0b0b10;color:white;font-family:Segoe UI}
 .btn{background:#2a2f3a;color:#ccc}
 .btn:hover{background:#3b4252;color:white}
 .glass{background:rgba(20,20,30,.7);backdrop-filter:blur(10px)}
-.showBox{width:220px;background:#111;border-radius:12px;padding:10px;flex-shrink:0}
-.showBox img{height:140px;width:100%;object-fit:cover;border-radius:8px}
 .upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
 @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* GAMER LOGO */
+/* Showcase box responsive */
+.showBox{width:160px;background:#111;border-radius:12px;padding:10px;flex-shrink:0}
+.showBox img{height:120px;width:100%;object-fit:cover;border-radius:8px}
+@media(min-width:640px){.showBox{width:200px}.showBox img{height:140px}}
+@media(min-width:1024px){.showBox{width:240px}.showBox img{height:160px}}
+
+/* Gamer Logo */
 .logoText{
-  font-family:'Orbitron',sans-serif;
-  font-size:28px;
-  letter-spacing:2px;
-  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
+ font-family:'Orbitron',sans-serif;
+ font-size:26px;
+ letter-spacing:2px;
+ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+ -webkit-background-clip:text;
+ -webkit-text-fill-color:transparent;
+ text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
 }
 </style>
 </head>
@@ -45,7 +46,7 @@ body{background:#0b0b10;color:white;font-family:Segoe UI}
  <div onclick="toggleCart()">🛒 <span id="cartCount">0</span></div>
 </div>
 
-<!-- UPCOMING TOP -->
+<!-- UPCOMING (TOP) -->
 <div class="p-4 overflow-hidden">
  <h2 class="text-yellow-400 font-bold mb-2">⏳ Upcoming</h2>
  <div class="overflow-hidden">
@@ -53,8 +54,8 @@ body{background:#0b0b10;color:white;font-family:Segoe UI}
  </div>
 </div>
 
-<!-- SEARCH -->
-<div class="p-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+<!-- SEARCH / FILTER -->
+<div class="p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
  <input id="search" placeholder="Search game..." class="p-2 bg-black border">
  <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border">
  <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border">
@@ -74,11 +75,11 @@ body{background:#0b0b10;color:white;font-family:Segoe UI}
 <!-- RECENT -->
 <div class="p-4">
  <h2 class="text-green-400 font-bold mb-2">👀 Recently Viewed</h2>
- <div id="recentBox" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
+ <div id="recentBox" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2"></div>
 </div>
 
 <!-- PRODUCTS -->
-<div id="products" class="grid grid-cols-2 gap-3 p-3"></div>
+<div id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3"></div>
 
 <!-- CART -->
 <div id="cartBox" class="fixed top-0 right-0 w-[320px] h-full bg-black p-4 translate-x-full transition z-50">
@@ -92,7 +93,7 @@ body{background:#0b0b10;color:white;font-family:Segoe UI}
 <div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center" onclick="closeModal()">
  <div class="bg-[#15151a] w-full max-w-lg rounded-xl p-4" onclick="event.stopPropagation()">
   <button onclick="closeModal()" class="float-right text-xl">✖</button>
-  <iframe id="mVideo" class="w-full h-56 mb-3"></iframe>
+  <iframe id="mVideo" class="w-full h-40 sm:h-56 md:h-64 mb-3"></iframe>
   <h2 id="mTitle" class="text-2xl font-bold"></h2>
   <p id="mPrice" class="text-green-400 text-xl font-bold my-2"></p>
   <div class="grid grid-cols-2 gap-3 mt-3">
