@@ -406,7 +406,7 @@
     }
 
     if (sortBy.value === "price-asc") {
-      f.sort((a, b) => a.price - b.price);
+      f.sort((a, b) => a.price - b.price); // common pattern for price sort [web:13][web:19]
     } else if (sortBy.value === "price-desc") {
       f.sort((a, b) => b.price - a.price);
     } else if (sortBy.value === "name-asc") {
@@ -465,6 +465,7 @@
       search.value = "";
       minP.value = "";
       maxP.value = "";
+      // future me yaha sirf discounted products dikhane ke liye extra flag use kar sakte ho
     } else if (type === "under-999") {
       search.value = "";
       minP.value = "";
