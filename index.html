@@ -104,13 +104,11 @@
     text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
   }
 
-  /* Better modal scroll handling on mobile */
   #modalInner {
     max-height:90vh;
     overflow-y:auto;
   }
 
-  /* Hide number input spinners (Chrome) */
   input[type=number]::-webkit-outer-spin-button,
   input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance:none;
@@ -129,14 +127,21 @@
     <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
     <div class="logoText">BRAHMASTRA</div>
   </div>
-  <button onclick="toggleCart()" class="relative flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-900 hover:bg-gray-800">
-    <span class="text-lg">🛒</span>
-    <span class="text-sm">Cart</span>
-    <span class="absolute -top-1 -right-1 bg-green-500 text-black text-xs font-bold rounded-full px-1.5 py-0.5" id="cartCount">0</span>
-  </button>
+  <div class="flex items-center">
+    <button onclick="toggleWishlist()" class="relative flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-900 hover:bg-gray-800 mr-2">
+      <span class="text-lg">♡</span>
+      <span class="text-sm">Wishlist</span>
+      <span class="absolute -top-1 -right-1 bg-pink-500 text-black text-xs font-bold rounded-full px-1.5 py-0.5" id="wishlistCount">0</span>
+    </button>
+    <button onclick="toggleCart()" class="relative flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-900 hover:bg-gray-800">
+      <span class="text-lg">🛒</span>
+      <span class="text-sm">Cart</span>
+      <span class="absolute -top-1 -right-1 bg-green-500 text-black text-xs font-bold rounded-full px-1.5 py-0.5" id="cartCount">0</span>
+    </button>
+  </div>
 </header>
 
-<!-- UPCOMING (TOP) -->
+<!-- UPCOMING -->
 <section class="p-4 overflow-hidden">
   <div class="flex items-center justify-between mb-2">
     <h2 class="text-yellow-400 font-semibold tracking-wide">⏳ Upcoming Releases</h2>
@@ -149,11 +154,29 @@
 
 <!-- SEARCH / FILTER -->
 <section class="p-3 border-y border-gray-900 bg-black/50">
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
     <input id="search" placeholder="Search game..." class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
     <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
     <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border border-gray-700 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-purple-500">
     <button onclick="render()" class="bg-purple-600 hover:bg-purple-700 p-2 rounded-md text-sm font-semibold">Apply Filters</button>
+    <select id="sortBy" class="p-2 bg-black border border-gray-700 rounded-md text-sm">
+      <option value="">Sort: Default</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="name-asc">Name: A → Z</option>
+    </select>
+  </div>
+
+  <div class="mt-3 flex flex-wrap gap-2 text-xs">
+    <button class="px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700" onclick="applyChip('best-deals')">
+      Best Deals (40%+ OFF)
+    </button>
+    <button class="px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700" onclick="applyChip('under-999')">
+      Under ₹999
+    </button>
+    <button class="px-3 py-1 rounded-full bg-gray-800 hover:bg-gray-700" onclick="applyChip('reset')">
+      Reset Filters
+    </button>
   </div>
 </section>
 
@@ -195,6 +218,15 @@
   </div>
 </aside>
 
+<!-- WISHLIST -->
+<aside id="wishlistBox" class="fixed top-0 left-0 w-[320px] max-w-[80vw] h-full bg-[#050509] border-r border-gray-800 p-4 -translate-x-full transition-transform duration-300 z-50 flex flex-col">
+  <div class="flex items-center justify-between mb-2">
+    <h3 class="font-semibold text-lg">Wishlist</h3>
+    <button onclick="toggleWishlist()" class="text-gray-400 hover:text-gray-200 text-xl leading-none">✖</button>
+  </div>
+  <div id="wishlistItems" class="mt-2 flex-1 overflow-y-auto text-sm space-y-2 pr-1"></div>
+</aside>
+
 <!-- MODAL -->
 <div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center px-3" onclick="closeModal()">
   <div id="modalInner" class="bg-[#101018] w-full max-w-lg rounded-xl p-4 shadow-2xl border border-gray-800" onclick="event.stopPropagation()">
@@ -210,6 +242,9 @@
       <button id="mAdd" class="bg-purple-600 hover:bg-purple-700 py-3 rounded-lg text-base font-semibold">Add to Cart</button>
       <button id="mBuy" class="bg-green-600 hover:bg-green-700 py-3 rounded-lg text-base font-semibold">Buy Now</button>
     </div>
+    <button id="mWish" class="mt-3 w-full bg-pink-600 hover:bg-pink-700 py-2 rounded-lg text-sm font-semibold">
+      Add to Wishlist
+    </button>
   </div>
 </div>
 
@@ -222,7 +257,6 @@
     {id:4,title:"Alice VR",price:1299,old:0,video:"",img:"https://wallpapers.com/images/hd/vr-game-desert-landscape-4k-2p0z47d6jq7c5qj0.jpg"}
   ];
 
-  // Fill demo games up to 40
   while (products.length < 40) {
     const i = products.length + 1;
     products.push({
@@ -245,10 +279,10 @@
   // ---------- STATE ----------
   let cart = [];
   let recent = [];
+  let wishlist = [];
   let showIndex = 0;
   let selected = null;
 
-  // Safe localStorage helpers (avoid crashes in private mode etc.)
   function loadLocal(key, fallback) {
     try {
       const v = localStorage.getItem(key);
@@ -260,13 +294,12 @@
   function saveLocal(key, value) {
     try {
       localStorage.setItem(key, JSON.stringify(value));
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   cart = loadLocal("cart", []);
   recent = loadLocal("recent", []);
+  wishlist = loadLocal("wishlist", []);
 
   // ---------- ELEMENTS ----------
   const showcase = document.getElementById("showcase");
@@ -277,15 +310,20 @@
   const cartItems = document.getElementById("cartItems");
   const totalEl = document.getElementById("total");
   const cartBox = document.getElementById("cartBox");
+  const wishlistBox = document.getElementById("wishlistBox");
+  const wishlistItems = document.getElementById("wishlistItems");
+  const wishlistCount = document.getElementById("wishlistCount");
   const modal = document.getElementById("modal");
   const mTitle = document.getElementById("mTitle");
   const mPrice = document.getElementById("mPrice");
   const mVideo = document.getElementById("mVideo");
   const mAdd = document.getElementById("mAdd");
   const mBuy = document.getElementById("mBuy");
+  const mWish = document.getElementById("mWish");
   const search = document.getElementById("search");
   const minP = document.getElementById("minP");
   const maxP = document.getElementById("maxP");
+  const sortBy = document.getElementById("sortBy");
 
   // ---------- SHOWCASE ----------
   function renderShowcase() {
@@ -367,6 +405,14 @@
       f = f.filter(p => p.price <= maxVal);
     }
 
+    if (sortBy.value === "price-asc") {
+      f.sort((a, b) => a.price - b.price);
+    } else if (sortBy.value === "price-desc") {
+      f.sort((a, b) => b.price - a.price);
+    } else if (sortBy.value === "name-asc") {
+      f.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
     if (!f.length) {
       productsDiv.innerHTML = `<p class="col-span-full text-center text-sm text-gray-500 py-8">No games found. Try different filters.</p>`;
       return;
@@ -388,15 +434,23 @@
               </div>` : `<div class="h-5"></div>`}
             <div class="flex items-center justify-between mt-1">
               <div class="price">₹${p.price}</div>
-              <button class="text-xs text-purple-300 hover:text-purple-100 underline" onclick="event.stopPropagation(); addCart(${p.id});">Add</button>
+              <div class="flex items-center gap-1">
+                <button class="text-xs text-purple-300 hover:text-purple-100 underline"
+                  onclick="event.stopPropagation(); addCart(${p.id});">Add</button>
+                <button class="text-xs"
+                  onclick="event.stopPropagation(); toggleWishlistItem(${p.id});">
+                  <span id="wish-icon-${p.id}">♡</span>
+                </button>
+              </div>
             </div>
             <button class="btn w-full py-2 mt-2 text-sm font-semibold" onclick="openModal(${p.id})">View Details</button>
           </div>
         </div>`;
     }).join("");
+
+    updateWishlistIcons();
   }
 
-  // Live filter on typing (debounced)
   let filterTimer;
   [search, minP, maxP].forEach(inp => {
     inp.addEventListener("input", () => {
@@ -404,6 +458,27 @@
       filterTimer = setTimeout(render, 200);
     });
   });
+  sortBy.addEventListener("change", render);
+
+  function applyChip(type) {
+    if (type === "best-deals") {
+      search.value = "";
+      minP.value = "";
+      maxP.value = "";
+      // discount-only logic ko backend ya extra flag ke saath future me expand kar sakte ho
+    } else if (type === "under-999") {
+      search.value = "";
+      minP.value = "";
+      maxP.value = 999;
+    } else if (type === "reset") {
+      search.value = "";
+      minP.value = "";
+      maxP.value = "";
+      sortBy.value = "";
+    }
+    render();
+  }
+  window.applyChip = applyChip;
 
   // ---------- MODAL ----------
   function openModal(id) {
@@ -415,7 +490,10 @@
     mVideo.src = selected.video || "";
     mAdd.onclick = () => { addCart(selected.id); closeModal(); };
     mBuy.onclick = () => { buyNow(selected); };
+    mWish.onclick = () => toggleWishlistItem(selected.id);
+
     saveRecent(selected);
+    updateWishlistIcons();
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
   }
@@ -496,6 +574,63 @@
   window.changeQty = changeQty;
   window.removeItem = removeItem;
 
+  // ---------- WISHLIST ----------
+  function toggleWishlist() {
+    wishlistBox.classList.toggle("-translate-x-full");
+  }
+  window.toggleWishlist = toggleWishlist;
+
+  function saveWishlist() {
+    saveLocal("wishlist", wishlist);
+    renderWishlist();
+    updateWishlistIcons();
+  }
+
+  function toggleWishlistItem(id) {
+    const exists = wishlist.find(x => x.id === id);
+    if (exists) {
+      wishlist = wishlist.filter(x => x.id !== id);
+    } else {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      wishlist.push({ id: p.id, title: p.title, price: p.price, img: p.img });
+    }
+    saveWishlist();
+  }
+  window.toggleWishlistItem = toggleWishlistItem;
+
+  function renderWishlist() {
+    wishlistCount.innerText = wishlist.length;
+    if (!wishlist.length) {
+      wishlistItems.innerHTML = `<p class="text-xs text-gray-500">Wishlist is empty.</p>`;
+      return;
+    }
+    wishlistItems.innerHTML = wishlist.map(w => `
+      <div class="flex items-center gap-2 bg-gray-900/70 rounded-md px-2 py-1.5">
+        <img src="${w.img}" alt="${w.title}" class="w-10 h-10 rounded object-cover">
+        <div class="flex-1">
+          <p class="text-xs font-semibold line-clamp-2">${w.title}</p>
+          <p class="text-[11px] text-green-400">₹${w.price}</p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <button class="text-[11px] text-purple-300 hover:text-purple-100 underline"
+            onclick="addCart(${w.id})">Add</button>
+          <button class="text-[11px] text-red-400 hover:text-red-200"
+            onclick="toggleWishlistItem(${w.id})">Remove</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function updateWishlistIcons() {
+    products.forEach(p => {
+      const el = document.getElementById("wish-icon-" + p.id);
+      if (!el) return;
+      const isIn = wishlist.some(w => w.id === p.id);
+      el.textContent = isIn ? "♥" : "♡";
+    });
+  }
+
   // ---------- CHECKOUT ----------
   function checkout() {
     if (!cart.length) return;
@@ -522,8 +657,8 @@
   render();
   renderCart();
   renderRecent();
+  renderWishlist();
+  updateWishlistIcons();
 </script>
 </body>
 </html>
-
-
