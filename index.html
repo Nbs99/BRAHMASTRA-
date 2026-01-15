@@ -1,124 +1,226 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Responsive Demo Site</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brahmastra Gaming Store</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Gamer Font -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
 <style>
-:root{
-  --main:#2563eb;
-  --dark:#0f172a;
-  --light:#f8fafc;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
-body{background:var(--light);color:#111}
+body{background:#0b0b10;color:white;font-family:Segoe UI}
+.card{background:#0f1218;border:1px solid #1f2430;transition:.3s;position:relative}
+.card:hover{transform:translateY(-5px)}
+.discount{background:#b91c1c;padding:4px 8px;font-size:12px;font-weight:bold}
+.old{color:#888;text-decoration:line-through;font-size:13px}
+.price{color:#22c55e;font-size:20px;font-weight:bold}
+.btn{background:#2a2f3a;color:#ccc}
+.btn:hover{background:#3b4252;color:white}
+.glass{background:rgba(20,20,30,.7);backdrop-filter:blur(10px)}
+.showBox{width:220px;background:#111;border-radius:12px;padding:10px;flex-shrink:0}
+.showBox img{height:140px;width:100%;object-fit:cover;border-radius:8px}
+.upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* NAV */
-nav{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:15px 20px;background:var(--dark);color:white;
-}
-nav h1{color:#38bdf8}
-nav button{display:none;background:none;border:none;color:white;font-size:22px}
-
-/* MENU */
-.menu{display:flex;gap:20px}
-.menu a{color:white;text-decoration:none}
-
-/* HERO */
-.hero{
-  padding:60px 20px;
-  text-align:center;
-  background:linear-gradient(120deg,#2563eb,#38bdf8);
-  color:white;
-}
-.hero h2{font-size:40px;margin-bottom:10px}
-.hero p{opacity:.9}
-
-/* GRID */
-.container{padding:40px 20px}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-}
-.card{
-  background:white;border-radius:10px;
-  overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.1)
-}
-.card img{width:100%;height:180px;object-fit:cover}
-.card div{padding:15px}
-
-/* FOOTER */
-footer{text-align:center;padding:20px;background:#e5e7eb}
-
-/* MOBILE */
-@media(max-width:768px){
-  nav button{display:block}
-  .menu{
-    display:none;flex-direction:column;
-    position:absolute;top:60px;left:0;width:100%;
-    background:#020617;padding:15px
-  }
-  .menu.show{display:flex}
-  .hero h2{font-size:28px}
+/* GAMER LOGO */
+.logoText{
+  font-family:'Orbitron',sans-serif;
+  font-size:28px;
+  letter-spacing:2px;
+  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:0 0 10px rgba(34,197,94,.6),0 0 20px rgba(59,130,246,.4);
 }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav>
-  <h1>MyResponsive</h1>
-  <button onclick="toggleMenu()">☰</button>
-  <div class="menu" id="menu">
-    <a href="#">Home</a>
-    <a href="#">Products</a>
-    <a href="#">Services</a>
-    <a href="#">Contact</a>
+<div class="bg-black flex justify-between items-center px-4 py-3 sticky top-0 z-50">
+ <div class="logoText">BRAHMASTRA</div>
+ <div onclick="toggleCart()">🛒 <span id="cartCount">0</span></div>
+</div>
+
+<!-- UPCOMING TOP -->
+<div class="p-4 overflow-hidden">
+ <h2 class="text-yellow-400 font-bold mb-2">⏳ Upcoming</h2>
+ <div class="overflow-hidden">
+  <div id="upcomingTrack" class="upcoming-track"></div>
+ </div>
+</div>
+
+<!-- SEARCH -->
+<div class="p-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+ <input id="search" placeholder="Search game..." class="p-2 bg-black border">
+ <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border">
+ <input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border">
+ <button onclick="render()" class="bg-purple-600 p-2">Apply</button>
+</div>
+
+<!-- SHOWCASE -->
+<div class="p-4 relative">
+ <h2 class="text-purple-400 font-bold mb-2">🔥 Featured</h2>
+ <button onclick="slideLeft()" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">◀</button>
+ <button onclick="slideRight()" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black/70 px-3 py-2">▶</button>
+ <div class="overflow-hidden">
+  <div id="showcase" class="flex gap-4 transition-all duration-500"></div>
+ </div>
+</div>
+
+<!-- RECENT -->
+<div class="p-4">
+ <h2 class="text-green-400 font-bold mb-2">👀 Recently Viewed</h2>
+ <div id="recentBox" class="grid grid-cols-3 md:grid-cols-6 gap-2"></div>
+</div>
+
+<!-- PRODUCTS -->
+<div id="products" class="grid grid-cols-2 gap-3 p-3"></div>
+
+<!-- CART -->
+<div id="cartBox" class="fixed top-0 right-0 w-[320px] h-full bg-black p-4 translate-x-full transition z-50">
+ <button onclick="toggleCart()">Close</button>
+ <div id="cartItems" class="mt-2"></div>
+ <p class="mt-2 font-bold">Total: ₹<span id="total">0</span></p>
+ <button onclick="checkout()" class="bg-green-600 w-full p-2 mt-2">Checkout WhatsApp</button>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center" onclick="closeModal()">
+ <div class="bg-[#15151a] w-full max-w-lg rounded-xl p-4" onclick="event.stopPropagation()">
+  <button onclick="closeModal()" class="float-right text-xl">✖</button>
+  <iframe id="mVideo" class="w-full h-56 mb-3"></iframe>
+  <h2 id="mTitle" class="text-2xl font-bold"></h2>
+  <p id="mPrice" class="text-green-400 text-xl font-bold my-2"></p>
+  <div class="grid grid-cols-2 gap-3 mt-3">
+   <button id="mAdd" class="bg-purple-600 py-3 rounded text-lg font-bold">Add to Cart</button>
+   <button id="mBuy" class="bg-green-600 py-3 rounded text-lg font-bold">Buy Now</button>
   </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <h2>Fully Responsive Website</h2>
-  <p>Works perfectly on PC, Tablet & Mobile</p>
-</section>
-
-<!-- CONTENT -->
-<section class="container">
-  <h2 style="text-align:center;margin-bottom:20px">Our Features</h2>
-  <div class="grid">
-    <div class="card">
-      <img src="https://picsum.photos/400/300?1">
-      <div><h3>Flexible Grid</h3><p>Auto adjusts to any screen.</p></div>
-    </div>
-    <div class="card">
-      <img src="https://picsum.photos/400/300?2">
-      <div><h3>Mobile Menu</h3><p>Touch friendly navigation.</p></div>
-    </div>
-    <div class="card">
-      <img src="https://picsum.photos/400/300?3">
-      <div><h3>Optimized Images</h3><p>Fast loading visuals.</p></div>
-    </div>
-    <div class="card">
-      <img src="https://picsum.photos/400/300?4">
-      <div><h3>Cross Browser</h3><p>Works on Chrome, Edge, Firefox.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  © 2026 Responsive Demo | All Devices Supported
-</footer>
+ </div>
+</div>
 
 <script>
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("show");
+let products=[
+{id:1,title:"Resident Evil Requiem",price:3607,old:4399,video:"https://www.youtube.com/embed/K0u_kAWLJOA",img:"https://wallpapers.com/images/hd/resident-evil-4-remake-leon-4k-9m1u8u5j7f5k4wvn.jpg"},
+{id:2,title:"Reanimal Deluxe",price:2160,old:2400,video:"https://www.youtube.com/embed/dQw4w9WgXcQ",img:"https://wallpapers.com/images/hd/dark-fantasy-game-wallpaper-4k-5m3xtq8x3x2mzyaw.jpg"},
+{id:3,title:"Core Keeper",price:899,old:0,video:"",img:"https://wallpapers.com/images/hd/core-keeper-game-art-4k-w8jvhc6iydk8m2ts.jpg"},
+{id:4,title:"Alice VR",price:1299,old:0,video:"",img:"https://wallpapers.com/images/hd/vr-game-desert-landscape-4k-2p0z47d6jq7c5qj0.jpg"}
+];
+while(products.length<40){
+ let i=products.length+1;
+ products.push({id:i,title:"Demo Game "+i,price:500+i*40,old:0,
+ video:"https://www.youtube.com/embed/dQw4w9WgXcQ",
+ img:"https://picsum.photos/400?random="+i});
 }
+
+let showcaseGames=products.slice(0,6);
+let upcomingGames=[
+{title:"GTA VI",date:"2025",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
+{title:"Witcher 4",date:"2025",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+{title:"Far Cry 7",date:"2025",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
+];
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let recent=JSON.parse(localStorage.getItem("recent"))||[];
+let showIndex=0,selected=null;
+
+function renderShowcase(){
+ showcase.innerHTML=showcaseGames.map(g=>`
+ <div class="showBox"><img src="${g.img}">
+ <b>${g.title}</b><p class="price">₹${g.price}</p></div>`).join("");
+ updateShowcase();
+}
+function updateShowcase(){showcase.style.transform=`translateX(-${showIndex*240}px)`;}
+function slideLeft(){if(showIndex>0)showIndex--;updateShowcase();}
+function slideRight(){if(showIndex<showcaseGames.length-1)showIndex++;updateShowcase();}
+
+function renderUpcoming(){
+ let html=upcomingGames.map(g=>`
+ <div class="glass p-2 w-[160px] shrink-0 mx-2">
+ <img src="${g.img}" class="h-24 w-full object-cover mb-1">
+ <small>${g.title} - ${g.date}</small></div>`).join("");
+ upcomingTrack.innerHTML=html+html;
+}
+
+function renderRecent(){
+ recentBox.innerHTML=recent.map(p=>`
+ <div class="glass p-1"><img src="${p.img}" class="h-16 w-full object-cover">
+ <small>${p.title}</small></div>`).join("");
+}
+
+const productsDiv=document.getElementById("products");
+function render(){
+ let f=[...products];
+ if(search.value)f=f.filter(p=>p.title.toLowerCase().includes(search.value.toLowerCase()));
+ if(minP.value)f=f.filter(p=>p.price>=+minP.value);
+ if(maxP.value)f=f.filter(p=>p.price<=+maxP.value);
+ productsDiv.innerHTML=f.map(p=>{
+ let off=p.old?Math.round((1-p.price/p.old)*100):0;
+ return `<div class="card">
+ <img src="${p.img}" class="w-full h-36 object-cover">
+ <div class="p-2">
+ <div>${p.title}</div>
+ ${p.old?`<div><span class="discount">-${off}%</span> <span class="old">₹${p.old}</span></div>`:""}
+ <div class="price">₹${p.price}</div>
+ <button class="btn w-full py-2 mt-2" onclick="openModal(${p.id})">VIEW</button>
+ </div></div>`}).join("");
+}
+
+function openModal(id){
+ selected=products.find(x=>x.id==id);
+ mTitle.innerText=selected.title;
+ mPrice.innerText="₹"+selected.price;
+ mVideo.src=selected.video||"";
+ mAdd.onclick=()=>{addCart(selected.id);closeModal();}
+ mBuy.onclick=()=>{buyNow(selected);}
+ saveRecent(selected);
+ modal.classList.remove("hidden");
+}
+function closeModal(){modal.classList.add("hidden");mVideo.src="";}
+
+function addCart(id){
+ let p=products.find(x=>x.id==id);
+ let f=cart.find(x=>x.id==id);
+ if(f)f.qty++; else cart.push({...p,qty:1});
+ saveCart();
+}
+function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));renderCart();}
+function renderCart(){
+ cartCount.innerText=cart.length;
+ let t=0;
+ cartItems.innerHTML=cart.map(i=>{
+ t+=i.price*i.qty;
+ return `<div>${i.title} x${i.qty} = ₹${i.price*i.qty}</div>`}).join("")||"Cart Empty";
+ total.innerText=t;
+}
+function toggleCart(){cartBox.classList.toggle("translate-x-full");}
+
+function saveRecent(p){
+ recent=[p,...recent.filter(x=>x.id!=p.id)].slice(0,6);
+ localStorage.setItem("recent",JSON.stringify(recent));
+ renderRecent();
+}
+
+function checkout(){
+ if(!cart.length)return;
+ let msg="I want to buy:\n",t=0;
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty} = ₹${i.price*i.qty}\n`;t+=i.price*i.qty;});
+ msg+=`Total = ₹${t}`;
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+}
+function buyNow(p){
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(`I want to buy ${p.title} for ₹${p.price}`));
+}
+
+renderShowcase();
+renderUpcoming();
+render();
+renderCart();
+renderRecent();
 </script>
 </body>
 </html>
-
+```
