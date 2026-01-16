@@ -42,9 +42,7 @@ body{background:#0b0b10;color:#f9fafb}
   width:max-content;
   animation:scrollLeft 30s linear infinite;
 }
-.upcoming-wrapper:hover .upcoming-track{
-  animation-play-state:paused;
-}
+.upcoming-wrapper:hover .upcoming-track{animation-play-state:paused;}
 @keyframes scrollLeft{
   from{transform:translateX(0)}
   to{transform:translateX(-50%)}
@@ -58,11 +56,16 @@ body{background:#0b0b10;color:#f9fafb}
 <body>
 
 <!-- HEADER -->
-<header class="sticky top-0 bg-black/80 backdrop-blur flex justify-between items-center px-4 py-3 border-b border-gray-800 z-50">
-  <div class="logoText">BRAHMASTRA</div>
+<header class="sticky top-0 bg-black/80 backdrop-blur px-4 py-3 border-b border-gray-800 z-50 relative flex items-center">
+  <!-- Left -->
   <div class="flex gap-3">
     <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
     <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+  </div>
+
+  <!-- Center Logo -->
+  <div class="absolute left-1/2 -translate-x-1/2 logoText">
+    BRAHMASTRA
   </div>
 </header>
 
@@ -138,11 +141,11 @@ for(let i=1;i<=40;i++){
 
 // UPCOMING
 const upcomingGames=[
- {title:"GTA VI",img:"https://upload.wikimedia.org/wikipedia/en/4/4b/Grand_Theft_Auto_VI_logo.svg"},
+ {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
  {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
  {title:"Assassin’s Creed Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"},
- {title:"Call of Duty 2025",img:"https://upload.wikimedia.org/wikipedia/en/4/4f/Call_of_Duty_Modern_Warfare_II_Key_Art.jpg"}
+ {title:"Call of Duty 2025",img:"https://wallpapers.com/images/hd/call-of-duty-cover.jpg"}
 ];
 
 let cart=[],wishlist=[],selected=null;
