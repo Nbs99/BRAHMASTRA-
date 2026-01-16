@@ -12,7 +12,7 @@ body{background:#0b0b10;color:#f9fafb}
 background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 text-shadow:0 0 10px rgba(34,197,94,.6)}
-.card{background:#0f1218;border:1px solid #1f2430;border-radius:12px;overflow:hidden}
+.card{background:#0f1218;border:1px solid #1f2430;border-radius:12px;overflow:hidden;transition:.3s}
 .card:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(0,0,0,.6)}
 .price{color:#22c55e;font-weight:700}
 .glass{background:rgba(17,24,39,.8);backdrop-filter:blur(10px);border:1px solid #374151;border-radius:12px}
@@ -47,7 +47,15 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
   </div>
 </section>
 
-<!-- SEARCH -->
+<!-- SHOWCASE -->
+<section class="p-4">
+  <h2 class="text-purple-400 font-semibold mb-2">🔥 Featured Games</h2>
+  <div class="overflow-hidden showcase-wrapper">
+    <div id="showcase" class="showcase-track"></div>
+  </div>
+</section>
+
+<!-- SEARCH / FILTER -->
 <section class="p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
   <input id="search" placeholder="Search game..." class="p-2 bg-black border border-gray-700 rounded">
   <input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border border-gray-700 rounded">
@@ -58,14 +66,6 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
     <option value="price-desc">High → Low</option>
     <option value="name-asc">Name A-Z</option>
   </select>
-</section>
-
-<!-- SHOWCASE -->
-<section class="p-4">
-  <h2 class="text-purple-400 font-semibold mb-2">🔥 Featured</h2>
-  <div class="overflow-hidden showcase-wrapper">
-    <div id="showcase" class="showcase-track"></div>
-  </div>
 </section>
 
 <!-- RECENT -->
@@ -94,16 +94,16 @@ text-shadow:0 0 10px rgba(34,197,94,.6)}
 <!-- MODAL -->
 <div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-3" onclick="closeModal()">
   <div class="bg-gray-900 p-4 rounded-xl max-w-md w-full" onclick="event.stopPropagation()">
-    <h2 id="mTitle" class="text-xl font-bold"></h2>
-    <iframe id="mVideo" class="w-full h-48 my-2"></iframe>
-    <p id="mPrice" class="price text-lg"></p>
-    <button id="mAdd" class="bg-purple-600 w-full py-2 mt-2 rounded">Add to Cart</button>
-    <button id="mBuy" class="bg-green-600 w-full py-2 mt-2 rounded">Buy Now</button>
+    <h2 id="mTitle" class="text-2xl font-bold"></h2>
+    <iframe id="mVideo" class="w-full h-56 my-3" allowfullscreen></iframe>
+    <p id="mPrice" class="price text-xl"></p>
+    <button id="mAdd" class="bg-purple-600 w-full py-3 mt-3 rounded text-lg font-bold">Add to Cart</button>
+    <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded text-lg font-bold">Buy Now</button>
   </div>
 </div>
 
 <script>
-/* DATA */
+/* PRODUCTS */
 const products=[];
 for(let i=1;i<=50;i++){
   products.push({
@@ -121,12 +121,15 @@ const upcomingGames=[
   {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
 ];
 
-/* STATE */
 let cart=[],wishlist=[],recent=[],selected=null;
 
 /* UPCOMING */
 const up=document.getElementById("upcoming");
-const upHtml=upcomingGames.map(g=>`<div class="glass w-40 p-2"><img src="${g.img}" class="h-24 w-full object-cover rounded"><p class="text-xs mt-1">${g.title}</p></div>`).join("");
+const upHtml=upcomingGames.map(g=>`
+<div class="glass w-40 p-2">
+  <img src="${g.img}" class="h-24 w-full object-cover rounded">
+  <p class="text-xs mt-1">${g.title}</p>
+</div>`).join("");
 up.innerHTML=upHtml+upHtml;
 
 /* SHOWCASE */
@@ -142,7 +145,7 @@ function renderShowcase(){
 }
 renderShowcase();
 
-/* SEARCH & PRODUCTS */
+/* PRODUCTS */
 const productsDiv=document.getElementById("products");
 function render(){
  let f=[...products];
@@ -154,13 +157,13 @@ function render(){
  if(sortBy.value==="price-desc") f.sort((a,b)=>b.price-a.price);
  if(sortBy.value==="name-asc") f.sort((a,b)=>a.title.localeCompare(b.title));
  productsDiv.innerHTML=f.map(p=>`
-  <div class="card">
+  <div class="card cursor-pointer" onclick="openModal(${p.id})">
    <img src="${p.img}" class="h-48 w-full object-cover">
    <div class="p-2">
     <div>${p.title}</div>
     <div class="price">₹${p.price}</div>
-    <button class="bg-purple-600 w-full mt-1 py-1 rounded" onclick="addCart(${p.id})">Add</button>
-    <button class="text-pink-400 text-xs mt-1" onclick="toggleWish(${p.id})">♡</button>
+    <button class="bg-purple-600 w-full mt-1 py-1 rounded"
+      onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
    </div>
   </div>`).join("");
 }
@@ -184,7 +187,8 @@ function closeModal(){modal.classList.add("hidden");mVideo.src=""}
 /* RECENT */
 function saveRecent(p){
  recent=[p,...recent.filter(x=>x.id!==p.id)].slice(0,6);
- recentBox.innerHTML=recent.map(r=>`<img src="${r.img}" class="h-20 w-full object-cover rounded">`).join("");
+ recentBox.innerHTML=recent.map(r=>`
+  <img src="${r.img}" class="h-20 w-full object-cover rounded">`).join("");
 }
 
 /* CART */
@@ -206,6 +210,7 @@ function renderCart(){
 function toggleCart(){cartBox.classList.toggle("translate-x-full")}
 
 /* WISHLIST */
+function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full")}
 function toggleWish(id){
  const f=wishlist.find(x=>x.id===id);
  if(f)wishlist=wishlist.filter(x=>x.id!==id);
@@ -214,9 +219,9 @@ function toggleWish(id){
 }
 function renderWish(){
  wishCount.innerText=wishlist.length;
- wishlistItems.innerHTML=wishlist.map(w=>`<div>${w.title} - ₹${w.price}</div>`).join("");
+ wishlistItems.innerHTML=wishlist.map(w=>`
+  <div>${w.title} - ₹${w.price}</div>`).join("");
 }
-function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full")}
 
 /* CHECKOUT */
 function checkout(){
