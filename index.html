@@ -15,8 +15,21 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 .card:hover{transform:translateY(-4px);box-shadow:0 15px 30px #000}
 .price{color:#22c55e;font-weight:700}
 .glass{background:rgba(17,24,39,.85);backdrop-filter:blur(10px);border:1px solid #333;border-radius:12px}
-.upcoming-track{display:flex;gap:16px;width:max-content;animation:scrollLeft 25s linear infinite}
-@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* UPCOMING SCROLL */
+.upcoming-track{
+  display:flex;
+  gap:20px;
+  width:max-content;
+  animation:scrollLeft 25s linear infinite;
+}
+.upcoming-wrapper:hover .upcoming-track{
+  animation-play-state:paused;   /* hover = stop */
+}
+@keyframes scrollLeft{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
 </style>
 </head>
 <body>
@@ -33,7 +46,7 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 <!-- UPCOMING -->
 <section class="p-4">
   <h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
-  <div class="overflow-hidden glass">
+  <div class="upcoming-wrapper overflow-hidden glass">
     <div id="upcomingTrack" class="upcoming-track p-4"></div>
   </div>
 </section>
@@ -102,15 +115,15 @@ const upcomingTrack=document.getElementById("upcomingTrack");
 // UPCOMING RENDER
 function renderUpcoming(){
  const html=upcomingGames.map(g=>`
-  <div class="glass p-3 w-[280px] shrink-0">
-    <img src="${g.img}" class="h-44 w-full object-cover rounded mb-2">
+  <div class="glass p-3 w-[300px] shrink-0">
+    <img src="${g.img}" class="h-48 w-full object-cover rounded mb-2">
     <p class="font-semibold">${g.title}</p>
   </div>`).join("");
- upcomingTrack.innerHTML=html+html; // duplicate for infinite loop
+ upcomingTrack.innerHTML=html+html; // infinite loop
 }
 renderUpcoming();
 
-// PRODUCTS RENDER
+// PRODUCTS
 function render(){
  const q=document.getElementById("search").value.toLowerCase();
  const f=products.filter(p=>p.title.toLowerCase().includes(q));
