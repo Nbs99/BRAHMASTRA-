@@ -7,6 +7,11 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
 body{background:#0b0b10;color:#f9fafb}
 .logoText{
@@ -17,36 +22,16 @@ body{background:#0b0b10;color:#f9fafb}
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
   text-shadow:0 0 10px rgba(34,197,94,.5);
+  text-align:center;
+  width:100%;
 }
-.card{
-  background:#0f1218;
-  border:1px solid #1f2430;
-  border-radius:16px;
-  overflow:hidden;
-  transition:.3s;
-}
-.card:hover{
-  transform:translateY(-6px) scale(1.01);
-  box-shadow:0 20px 40px rgba(0,0,0,.7);
-}
+.card{background:#0f1218;border:1px solid #1f2430;border-radius:16px;overflow:hidden;transition:.3s}
+.card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 40px rgba(0,0,0,.7)}
 .price{color:#22c55e;font-weight:700}
-.glass{
-  background:rgba(17,24,39,.85);
-  backdrop-filter:blur(12px);
-  border:1px solid #333;
-  border-radius:16px;
-}
-.upcoming-track{
-  display:flex;
-  gap:20px;
-  width:max-content;
-  animation:scrollLeft 30s linear infinite;
-}
-.upcoming-wrapper:hover .upcoming-track{animation-play-state:paused;}
-@keyframes scrollLeft{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
-}
+.glass{background:rgba(17,24,39,.85);backdrop-filter:blur(12px);border:1px solid #333;border-radius:16px}
+.upcoming-track{display:flex;gap:20px;width:max-content;animation:scrollLeft 30s linear infinite}
+.upcoming-wrapper:hover .upcoming-track{animation-play-state:paused}
+@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .hero{
   background:linear-gradient(to right, rgba(0,0,0,.8), rgba(0,0,0,.2)),
   url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2vshz2k7.jpg") center/cover;
@@ -55,36 +40,37 @@ body{background:#0b0b10;color:#f9fafb}
 </head>
 <body>
 
+<!-- LOGIN -->
+<div id="loginBox" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+  <div class="bg-gray-900 p-6 rounded w-80">
+    <h2 class="text-xl font-bold mb-3">Login / Signup</h2>
+    <input id="email" placeholder="Email" class="w-full p-2 mb-2 bg-black border">
+    <input id="password" type="password" placeholder="Password" class="w-full p-2 mb-2 bg-black border">
+    <button onclick="login()" class="bg-purple-600 w-full py-2">Login</button>
+    <button onclick="signup()" class="bg-gray-700 w-full py-2 mt-2">Signup</button>
+  </div>
+</div>
+
 <!-- HEADER -->
-<header class="sticky top-0 bg-black/80 backdrop-blur px-4 py-3 border-b border-gray-800 z-50 relative flex items-center">
-  <!-- Left -->
+<header class="sticky top-0 bg-black/80 backdrop-blur px-4 py-3 border-b border-gray-800 z-40 flex justify-between items-center">
+  <div></div>
+  <div class="logoText">BRAHMASTRA</div>
   <div class="flex gap-3">
     <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
     <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
   </div>
-
-  <!-- Center Logo -->
-  <div class="absolute left-1/2 -translate-x-1/2 logoText">
-    BRAHMASTRA
-  </div>
 </header>
 
 <!-- HERO -->
-<section class="hero h-[60vh] flex flex-col justify-center px-6">
-  <h1 class="text-4xl md:text-5xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
-  <p class="text-gray-300 mb-4 max-w-lg">
-    Buy premium PC & console games instantly. Best prices. Trusted delivery.
-  </p>
-  <div class="flex gap-3">
-    <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})"
-      class="bg-purple-600 hover:bg-purple-700 px-5 py-3 rounded font-bold">Shop Now</button>
-    <button onclick="document.getElementById('upcoming').scrollIntoView({behavior:'smooth'})"
-      class="bg-gray-800 hover:bg-gray-700 px-5 py-3 rounded font-bold">Upcoming</button>
-  </div>
+<section class="hero h-[55vh] flex flex-col justify-center px-6">
+  <h1 class="text-4xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
+  <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
+  <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})"
+    class="bg-purple-600 px-5 py-3 rounded font-bold w-fit">Shop Now</button>
 </section>
 
 <!-- UPCOMING -->
-<section id="upcoming" class="p-5">
+<section class="p-5">
   <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
   <div class="upcoming-wrapper overflow-hidden glass">
     <div id="upcomingTrack" class="upcoming-track p-4"></div>
@@ -126,34 +112,58 @@ body{background:#0b0b10;color:#f9fafb}
   </div>
 </div>
 
-<script>
-// PRODUCTS
-const products=[];
-for(let i=1;i<=40;i++){
- products.push({
-  id:i,
-  title:"Game "+i,
-  price:600+i*40,
-  video:"https://www.youtube.com/embed/K0u_kAWLJOA",
-  img:"https://source.unsplash.com/600x800/?video-game,game&sig="+i
- });
-}
+<!-- ADMIN PANEL -->
+<div id="adminPanel" class="hidden p-4 bg-black border-t border-gray-800">
+  <h2 class="text-xl font-bold mb-2">Admin Panel</h2>
+  <input id="pName" placeholder="Game Name" class="p-2 bg-black border mb-2 w-full">
+  <input id="pPrice" placeholder="Price" type="number" class="p-2 bg-black border mb-2 w-full">
+  <input id="pImg" placeholder="Image URL" class="p-2 bg-black border mb-2 w-full">
+  <input id="pVideo" placeholder="YouTube Embed URL" class="p-2 bg-black border mb-2 w-full">
+  <button onclick="addProduct()" class="bg-green-600 px-4 py-2">Add Game</button>
+</div>
 
-// UPCOMING
+<script>
+/* FIREBASE */
+const firebaseConfig = {
+  apiKey: "AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
+  authDomain: "brahmastra-app.firebaseapp.com",
+  projectId: "brahmastra-app",
+  storageBucket: "brahmastra-app.firebasestorage.app",
+  messagingSenderId: "306469612802",
+  appId: "1:306469612802:web:4dcd061510b13e4d0d661b"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* LOGIN */
+function login(){
+  auth.signInWithEmailAndPassword(email.value,password.value)
+  .catch(e=>alert(e.message));
+}
+function signup(){
+  auth.createUserWithEmailAndPassword(email.value,password.value)
+  .then(res=>{
+    db.collection("users").doc(res.user.uid).set({email:res.user.email,role:"user"});
+  }).catch(e=>alert(e.message));
+}
+auth.onAuthStateChanged(user=>{
+  if(!user) return;
+  loginBox.style.display="none";
+  db.collection("users").doc(user.uid).get().then(d=>{
+    if(d.exists && d.data().role==="admin"){
+      adminPanel.classList.remove("hidden");
+    }
+  });
+});
+
+/* UPCOMING */
 const upcomingGames=[
  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
  {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
- {title:"Assassin’s Creed Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"},
- {title:"Call of Duty 2025",img:"https://wallpapers.com/images/hd/call-of-duty-cover.jpg"}
+ {title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
 ];
-
-let cart=[],wishlist=[],selected=null;
-
-const productsDiv=document.getElementById("products");
-const upcomingTrack=document.getElementById("upcomingTrack");
-
-// UPCOMING
 function renderUpcoming(){
  const html=upcomingGames.map(g=>`
   <div class="glass p-4 w-[320px] shrink-0">
@@ -164,29 +174,46 @@ function renderUpcoming(){
 }
 renderUpcoming();
 
-// PRODUCTS
+/* PRODUCTS FROM DB */
+let products=[];
+db.collection("products").orderBy("time","desc").onSnapshot(snap=>{
+ products=snap.docs.map(d=>({id:d.id,...d.data()}));
+ render();
+});
+
+/* ADMIN ADD */
+function addProduct(){
+ db.collection("products").add({
+  title:pName.value,
+  price:Number(pPrice.value),
+  img:pImg.value,
+  video:pVideo.value,
+  time:Date.now()
+ });
+ pName.value=pPrice.value=pImg.value=pVideo.value="";
+}
+
+/* STORE LOGIC */
+let cart=[],wishlist=[],selected=null;
 function render(){
- const q=document.getElementById("search").value.toLowerCase();
+ const q=search.value.toLowerCase();
  const f=products.filter(p=>p.title.toLowerCase().includes(q));
  productsDiv.innerHTML=f.map(p=>`
-  <div class="card cursor-pointer" onclick="openModal(${p.id})">
+  <div class="card" onclick="openModal('${p.id}')">
     <img src="${p.img}" class="h-56 w-full object-cover">
     <div class="p-3">
       <div class="font-semibold mb-1">${p.title}</div>
       <div class="price mb-2">₹${p.price}</div>
       <button class="bg-purple-600 w-full py-2 rounded font-semibold"
-        onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
+        onclick="event.stopPropagation(); addCart('${p.id}')">Add to Cart</button>
     </div>
   </div>`).join("");
 }
-render();
-
-// MODAL
 function openModal(id){
  selected=products.find(x=>x.id===id);
  mTitle.innerText=selected.title;
  mPrice.innerText="₹"+selected.price;
- mVideo.src=selected.video;
+ mVideo.src=selected.video||"";
  mAdd.onclick=()=>addCart(selected.id);
  mBuy.onclick=()=>buyNow(selected);
  mWish.onclick=()=>toggleWishlistItem(selected.id);
@@ -194,7 +221,7 @@ function openModal(id){
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-// CART
+/* CART */
 function addCart(id){
  const p=products.find(x=>x.id===id);
  const f=cart.find(x=>x.id===id);
@@ -207,14 +234,13 @@ function renderCart(){
  cartItems.innerHTML=cart.map(i=>{
   t+=i.price*i.qty;
   return `<div class="flex justify-between">
-   <span>${i.title} x${i.qty}</span>
-   <span>₹${i.price*i.qty}</span></div>`;
+   <span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
  }).join("");
  total.innerText=t;
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-// WISHLIST
+/* WISHLIST */
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
 function toggleWishlistItem(id){
  const p=products.find(x=>x.id===id);
@@ -228,11 +254,11 @@ function renderWishlist(){
  wishlistItems.innerHTML=wishlist.map(w=>`
   <div class="flex justify-between">
     <span>${w.title}</span>
-    <button onclick="addCart(${w.id})">Add</button>
+    <button onclick="addCart('${w.id}')">Add</button>
   </div>`).join("");
 }
 
-// CHECKOUT
+/* CHECKOUT */
 function checkout(){
  if(!cart.length)return;
  let msg="Order:\n";let t=0;
