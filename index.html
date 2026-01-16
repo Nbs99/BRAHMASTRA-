@@ -14,17 +14,10 @@
 
 <style>
 body{background:#0b0b10;color:#f9fafb}
-.logoText{
-  font-family:Orbitron;
-  font-size:28px;
-  letter-spacing:2px;
-  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 0 10px rgba(34,197,94,.5);
-  text-align:center;
-  width:100%;
-}
+.logoText{font-family:Orbitron;font-size:28px;letter-spacing:2px;
+background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+text-shadow:0 0 10px rgba(34,197,94,.5);text-align:center;width:100%}
 .card{background:#0f1218;border:1px solid #1f2430;border-radius:16px;overflow:hidden;transition:.3s}
 .card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 40px rgba(0,0,0,.7)}
 .price{color:#22c55e;font-weight:700}
@@ -32,10 +25,8 @@ body{background:#0b0b10;color:#f9fafb}
 .upcoming-track{display:flex;gap:20px;width:max-content;animation:scrollLeft 30s linear infinite}
 .upcoming-wrapper:hover .upcoming-track{animation-play-state:paused}
 @keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.hero{
-  background:linear-gradient(to right, rgba(0,0,0,.8), rgba(0,0,0,.2)),
-  url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2vshz2k7.jpg") center/cover;
-}
+.hero{background:linear-gradient(to right, rgba(0,0,0,.8), rgba(0,0,0,.2)),
+url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2vshz2k7.jpg") center/cover}
 </style>
 </head>
 <body>
@@ -61,15 +52,16 @@ body{background:#0b0b10;color:#f9fafb}
   </div>
 </header>
 
-<!-- HERO -->
+<!-- USER AREA -->
+<div id="userArea" class="hidden">
+
 <section class="hero h-[55vh] flex flex-col justify-center px-6">
   <h1 class="text-4xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
   <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
-  <button onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})"
+  <button onclick="products.scrollIntoView({behavior:'smooth'})"
     class="bg-purple-600 px-5 py-3 rounded font-bold w-fit">Shop Now</button>
 </section>
 
-<!-- UPCOMING -->
 <section class="p-5">
   <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
   <div class="upcoming-wrapper overflow-hidden glass">
@@ -77,14 +69,13 @@ body{background:#0b0b10;color:#f9fafb}
   </div>
 </section>
 
-<!-- SEARCH -->
 <section class="p-4 bg-black/60 border-y border-gray-800">
   <input id="search" oninput="render()" placeholder="Search games..."
     class="w-full p-3 bg-black border border-gray-700 rounded">
 </section>
 
-<!-- PRODUCTS -->
 <main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 pb-24"></main>
+</div>
 
 <!-- CART -->
 <aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
@@ -123,152 +114,142 @@ body{background:#0b0b10;color:#f9fafb}
 </div>
 
 <script>
-/* FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
-  authDomain: "brahmastra-app.firebaseapp.com",
-  projectId: "brahmastra-app",
-  storageBucket: "brahmastra-app.firebasestorage.app",
-  messagingSenderId: "306469612802",
-  appId: "1:306469612802:web:4dcd061510b13e4d0d661b"
+const firebaseConfig={
+apiKey:"AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
+authDomain:"brahmastra-app.firebaseapp.com",
+projectId:"brahmastra-app",
+storageBucket:"brahmastra-app.firebasestorage.app",
+messagingSenderId:"306469612802",
+appId:"1:306469612802:web:4dcd061510b13e4d0d661b"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const auth=firebase.auth();
+const db=firebase.firestore();
 
 /* LOGIN */
-function login(){
-  auth.signInWithEmailAndPassword(email.value,password.value)
-  .catch(e=>alert(e.message));
-}
+function login(){auth.signInWithEmailAndPassword(email.value,password.value).catch(e=>alert(e.message))}
 function signup(){
-  auth.createUserWithEmailAndPassword(email.value,password.value)
-  .then(res=>{
-    db.collection("users").doc(res.user.uid).set({email:res.user.email,role:"user"});
-  }).catch(e=>alert(e.message));
+auth.createUserWithEmailAndPassword(email.value,password.value).then(r=>{
+db.collection("users").doc(r.user.uid).set({email:r.user.email,role:"user"})
+}).catch(e=>alert(e.message))
 }
+
+/* ROLE CHECK */
 auth.onAuthStateChanged(user=>{
-  if(!user) return;
-  loginBox.style.display="none";
-  db.collection("users").doc(user.uid).get().then(d=>{
-    if(d.exists && d.data().role==="admin"){
-      adminPanel.classList.remove("hidden");
-    }
-  });
+ if(!user){
+  loginBox.style.display="flex";
+  userArea.classList.add("hidden");
+  adminPanel.classList.add("hidden");
+  return;
+ }
+ loginBox.style.display="none";
+ db.collection("users").doc(user.uid).get().then(d=>{
+  if(!d.exists)return;
+  if(d.data().role==="admin"){
+    adminPanel.classList.remove("hidden");
+    userArea.classList.add("hidden");
+  }else{
+    adminPanel.classList.add("hidden");
+    userArea.classList.remove("hidden");
+  }
+ })
 });
 
 /* UPCOMING */
 const upcomingGames=[
- {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
- {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
- {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
- {title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
+{title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
+{title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+{title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
+{title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
 ];
 function renderUpcoming(){
- const html=upcomingGames.map(g=>`
-  <div class="glass p-4 w-[320px] shrink-0">
-    <img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
-    <p class="font-semibold">${g.title}</p>
-  </div>`).join("");
- upcomingTrack.innerHTML=html+html;
+upcomingTrack.innerHTML=upcomingGames.map(g=>`
+<div class="glass p-4 w-[320px] shrink-0">
+<img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
+<p class="font-semibold">${g.title}</p></div>`).join("")*2;
 }
 renderUpcoming();
 
-/* PRODUCTS FROM DB */
-let products=[];
-db.collection("products").orderBy("time","desc").onSnapshot(snap=>{
- products=snap.docs.map(d=>({id:d.id,...d.data()}));
- render();
+/* PRODUCTS */
+let products=[],cart=[],wishlist=[],selected=null;
+db.collection("products").onSnapshot(s=>{
+products=s.docs.map(d=>({id:d.id,...d.data()}));render()
 });
 
 /* ADMIN ADD */
 function addProduct(){
- db.collection("products").add({
-  title:pName.value,
-  price:Number(pPrice.value),
-  img:pImg.value,
-  video:pVideo.value,
-  time:Date.now()
- });
- pName.value=pPrice.value=pImg.value=pVideo.value="";
+db.collection("products").add({title:pName.value,price:+pPrice.value,img:pImg.value,video:pVideo.value,time:Date.now()});
+pName.value=pPrice.value=pImg.value=pVideo.value="";
 }
 
-/* STORE LOGIC */
-let cart=[],wishlist=[],selected=null;
+/* STORE */
 function render(){
- const q=search.value.toLowerCase();
- const f=products.filter(p=>p.title.toLowerCase().includes(q));
- productsDiv.innerHTML=f.map(p=>`
-  <div class="card" onclick="openModal('${p.id}')">
-    <img src="${p.img}" class="h-56 w-full object-cover">
-    <div class="p-3">
-      <div class="font-semibold mb-1">${p.title}</div>
-      <div class="price mb-2">₹${p.price}</div>
-      <button class="bg-purple-600 w-full py-2 rounded font-semibold"
-        onclick="event.stopPropagation(); addCart('${p.id}')">Add to Cart</button>
-    </div>
-  </div>`).join("");
+const q=search.value.toLowerCase();
+productsDiv.innerHTML=products.filter(p=>p.title.toLowerCase().includes(q)).map(p=>`
+<div class="card" onclick="openModal('${p.id}')">
+<img src="${p.img}" class="h-56 w-full object-cover">
+<div class="p-3"><div class="font-semibold mb-1">${p.title}</div>
+<div class="price mb-2">₹${p.price}</div>
+<button class="bg-purple-600 w-full py-2 rounded font-semibold"
+onclick="event.stopPropagation();addCart('${p.id}')">Add to Cart</button></div></div>`).join("");
 }
 function openModal(id){
- selected=products.find(x=>x.id===id);
- mTitle.innerText=selected.title;
- mPrice.innerText="₹"+selected.price;
- mVideo.src=selected.video||"";
- mAdd.onclick=()=>addCart(selected.id);
- mBuy.onclick=()=>buyNow(selected);
- mWish.onclick=()=>toggleWishlistItem(selected.id);
- modal.classList.remove("hidden");
+selected=products.find(x=>x.id===id);
+mTitle.innerText=selected.title;
+mPrice.innerText="₹"+selected.price;
+mVideo.src=selected.video||"";
+mAdd.onclick=()=>addCart(selected.id);
+mBuy.onclick=()=>buyNow(selected);
+mWish.onclick=()=>toggleWishlistItem(selected.id);
+modal.classList.remove("hidden");
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
 /* CART */
 function addCart(id){
- const p=products.find(x=>x.id===id);
- const f=cart.find(x=>x.id===id);
- if(f)f.qty++; else cart.push({...p,qty:1});
- renderCart();
+const p=products.find(x=>x.id===id);
+const f=cart.find(x=>x.id===id);
+if(f)f.qty++;else cart.push({...p,qty:1});
+renderCart();
 }
 function renderCart(){
- cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
- let t=0;
- cartItems.innerHTML=cart.map(i=>{
-  t+=i.price*i.qty;
-  return `<div class="flex justify-between">
-   <span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
- }).join("");
- total.innerText=t;
+cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
+let t=0;
+cartItems.innerHTML=cart.map(i=>{
+t+=i.price*i.qty;
+return `<div class="flex justify-between"><span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
+}).join("");
+total.innerText=t;
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
 /* WISHLIST */
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
 function toggleWishlistItem(id){
- const p=products.find(x=>x.id===id);
- if(wishlist.find(x=>x.id===id))
-  wishlist=wishlist.filter(x=>x.id!==id);
- else wishlist.push(p);
- renderWishlist();
+const p=products.find(x=>x.id===id);
+if(wishlist.find(x=>x.id===id))wishlist=wishlist.filter(x=>x.id!==id);
+else wishlist.push(p);
+renderWishlist();
 }
 function renderWishlist(){
- wishlistCount.innerText=wishlist.length;
- wishlistItems.innerHTML=wishlist.map(w=>`
-  <div class="flex justify-between">
-    <span>${w.title}</span>
-    <button onclick="addCart('${w.id}')">Add</button>
-  </div>`).join("");
+wishlistCount.innerText=wishlist.length;
+wishlistItems.innerHTML=wishlist.map(w=>`
+<div class="flex justify-between"><span>${w.title}</span>
+<button onclick="addCart('${w.id}')">Add</button></div>`).join("");
 }
 
 /* CHECKOUT */
 function checkout(){
- if(!cart.length)return;
- let msg="Order:\n";let t=0;
- cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
- msg+=`Total ₹${t}`;
- window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+if(!cart.length)return;
+let msg="Order:\n",t=0;
+cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
+msg+=`Total ₹${t}`;
+window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
 }
 function buyNow(p){
- window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
+window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
 }
 </script>
 </body>
 </html>
+
