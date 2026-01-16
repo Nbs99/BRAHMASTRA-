@@ -58,7 +58,7 @@ url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2
 <section class="hero h-[55vh] flex flex-col justify-center px-6">
   <h1 class="text-4xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
   <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
-  <button onclick="products.scrollIntoView({behavior:'smooth'})"
+  <button onclick="productsDiv.scrollIntoView({behavior:'smooth'})"
     class="bg-purple-600 px-5 py-3 rounded font-bold w-fit">Shop Now</button>
 </section>
 
@@ -70,7 +70,7 @@ url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2
 </section>
 
 <section class="p-4 bg-black/60 border-y border-gray-800">
-  <input id="search" oninput="render()" placeholder="Search games..."
+  <input id="search" placeholder="Search games..."
     class="w-full p-3 bg-black border border-gray-700 rounded">
 </section>
 
@@ -114,27 +114,33 @@ url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2
 </div>
 
 <script>
+/* ---------- FIREBASE ---------- */
 const firebaseConfig={
-apiKey:"AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
-authDomain:"brahmastra-app.firebaseapp.com",
-projectId:"brahmastra-app",
-storageBucket:"brahmastra-app.firebasestorage.app",
-messagingSenderId:"306469612802",
-appId:"1:306469612802:web:4dcd061510b13e4d0d661b"
+ apiKey:"AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
+ authDomain:"brahmastra-app.firebaseapp.com",
+ projectId:"brahmastra-app",
+ storageBucket:"brahmastra-app.firebasestorage.app",
+ messagingSenderId:"306469612802",
+ appId:"1:306469612802:web:4dcd061510b13e4d0d661b"
 };
 firebase.initializeApp(firebaseConfig);
 const auth=firebase.auth();
 const db=firebase.firestore();
 
-/* LOGIN */
+/* ---------- DOM ---------- */
+const productsDiv=document.getElementById("products");
+const search=document.getElementById("search");
+const upcomingTrack=document.getElementById("upcomingTrack");
+
+/* ---------- LOGIN ---------- */
 function login(){auth.signInWithEmailAndPassword(email.value,password.value).catch(e=>alert(e.message))}
 function signup(){
-auth.createUserWithEmailAndPassword(email.value,password.value).then(r=>{
-db.collection("users").doc(r.user.uid).set({email:r.user.email,role:"user"})
-}).catch(e=>alert(e.message))
+ auth.createUserWithEmailAndPassword(email.value,password.value).then(r=>{
+  db.collection("users").doc(r.user.uid).set({email:r.user.email,role:"user"})
+ }).catch(e=>alert(e.message))
 }
 
-/* ROLE CHECK */
+/* ---------- ROLE ---------- */
 auth.onAuthStateChanged(user=>{
  if(!user){
   loginBox.style.display="flex";
@@ -155,7 +161,7 @@ auth.onAuthStateChanged(user=>{
  })
 });
 
-/* UPCOMING */
+/* ---------- UPCOMING ---------- */
 const upcomingGames=[
 {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
 {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
@@ -163,91 +169,113 @@ const upcomingGames=[
 {title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
 ];
 function renderUpcoming(){
-upcomingTrack.innerHTML=upcomingGames.map(g=>`
-<div class="glass p-4 w-[320px] shrink-0">
-<img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
-<p class="font-semibold">${g.title}</p></div>`).join("")*2;
+ const html=upcomingGames.map(g=>`
+  <div class="glass p-4 w-[320px] shrink-0">
+   <img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
+   <p class="font-semibold">${g.title}</p>
+  </div>`).join("");
+ upcomingTrack.innerHTML=html+html;
 }
 renderUpcoming();
 
-/* PRODUCTS */
+/* ---------- PRODUCTS ---------- */
 let products=[],cart=[],wishlist=[],selected=null;
 db.collection("products").onSnapshot(s=>{
-products=s.docs.map(d=>({id:d.id,...d.data()}));render()
+ products=s.docs.map(d=>({id:d.id,...d.data()}));
+ render();
 });
 
-/* ADMIN ADD */
+/* ---------- ADMIN ADD ---------- */
 function addProduct(){
-db.collection("products").add({title:pName.value,price:+pPrice.value,img:pImg.value,video:pVideo.value,time:Date.now()});
-pName.value=pPrice.value=pImg.value=pVideo.value="";
+ db.collection("products").add({
+  title:pName.value,
+  price:+pPrice.value,
+  img:pImg.value,
+  video:pVideo.value,
+  time:Date.now()
+ });
+ pName.value=pPrice.value=pImg.value=pVideo.value="";
 }
 
-/* STORE */
+/* ---------- STORE ---------- */
 function render(){
-const q=search.value.toLowerCase();
-productsDiv.innerHTML=products.filter(p=>p.title.toLowerCase().includes(q)).map(p=>`
-<div class="card" onclick="openModal('${p.id}')">
-<img src="${p.img}" class="h-56 w-full object-cover">
-<div class="p-3"><div class="font-semibold mb-1">${p.title}</div>
-<div class="price mb-2">₹${p.price}</div>
-<button class="bg-purple-600 w-full py-2 rounded font-semibold"
-onclick="event.stopPropagation();addCart('${p.id}')">Add to Cart</button></div></div>`).join("");
+ const q=search.value.toLowerCase();
+ const list=products.filter(p=>p.title.toLowerCase().includes(q));
+ if(!list.length){
+  productsDiv.innerHTML="<p class='col-span-full text-center text-gray-500'>No Products</p>";
+  return;
+ }
+ productsDiv.innerHTML=list.map(p=>`
+  <div class="card" onclick="openModal('${p.id}')">
+   <img src="${p.img}" class="h-56 w-full object-cover">
+   <div class="p-3">
+    <div class="font-semibold mb-1">${p.title}</div>
+    <div class="price mb-2">₹${p.price}</div>
+    <button class="bg-purple-600 w-full py-2 rounded font-semibold"
+     onclick="event.stopPropagation();addCart('${p.id}')">Add to Cart</button>
+   </div>
+  </div>`).join("");
 }
+search.addEventListener("input",render);
+
+/* ---------- MODAL ---------- */
 function openModal(id){
-selected=products.find(x=>x.id===id);
-mTitle.innerText=selected.title;
-mPrice.innerText="₹"+selected.price;
-mVideo.src=selected.video||"";
-mAdd.onclick=()=>addCart(selected.id);
-mBuy.onclick=()=>buyNow(selected);
-mWish.onclick=()=>toggleWishlistItem(selected.id);
-modal.classList.remove("hidden");
+ selected=products.find(x=>x.id===id);
+ mTitle.innerText=selected.title;
+ mPrice.innerText="₹"+selected.price;
+ mVideo.src=selected.video||"";
+ mAdd.onclick=()=>addCart(selected.id);
+ mBuy.onclick=()=>buyNow(selected);
+ mWish.onclick=()=>toggleWishlistItem(selected.id);
+ modal.classList.remove("hidden");
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-/* CART */
+/* ---------- CART ---------- */
 function addCart(id){
-const p=products.find(x=>x.id===id);
-const f=cart.find(x=>x.id===id);
-if(f)f.qty++;else cart.push({...p,qty:1});
-renderCart();
+ const p=products.find(x=>x.id===id);
+ const f=cart.find(x=>x.id===id);
+ if(f)f.qty++; else cart.push({...p,qty:1});
+ renderCart();
 }
 function renderCart(){
-cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
-let t=0;
-cartItems.innerHTML=cart.map(i=>{
-t+=i.price*i.qty;
-return `<div class="flex justify-between"><span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
-}).join("");
-total.innerText=t;
+ cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
+ let t=0;
+ cartItems.innerHTML=cart.map(i=>{
+  t+=i.price*i.qty;
+  return `<div class="flex justify-between"><span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
+ }).join("");
+ total.innerText=t;
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-/* WISHLIST */
+/* ---------- WISHLIST ---------- */
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
 function toggleWishlistItem(id){
-const p=products.find(x=>x.id===id);
-if(wishlist.find(x=>x.id===id))wishlist=wishlist.filter(x=>x.id!==id);
-else wishlist.push(p);
-renderWishlist();
+ const p=products.find(x=>x.id===id);
+ if(wishlist.find(x=>x.id===id))wishlist=wishlist.filter(x=>x.id!==id);
+ else wishlist.push(p);
+ renderWishlist();
 }
 function renderWishlist(){
-wishlistCount.innerText=wishlist.length;
-wishlistItems.innerHTML=wishlist.map(w=>`
-<div class="flex justify-between"><span>${w.title}</span>
-<button onclick="addCart('${w.id}')">Add</button></div>`).join("");
+ wishlistCount.innerText=wishlist.length;
+ wishlistItems.innerHTML=wishlist.map(w=>`
+  <div class="flex justify-between">
+   <span>${w.title}</span>
+   <button onclick="addCart('${w.id}')">Add</button>
+  </div>`).join("");
 }
 
-/* CHECKOUT */
+/* ---------- CHECKOUT ---------- */
 function checkout(){
-if(!cart.length)return;
-let msg="Order:\n",t=0;
-cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
-msg+=`Total ₹${t}`;
-window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+ if(!cart.length)return;
+ let msg="Order:\n",t=0;
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
+ msg+=`Total ₹${t}`;
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
 }
 function buyNow(p){
-window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
 }
 </script>
 </body>
