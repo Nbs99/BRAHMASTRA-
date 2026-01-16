@@ -7,270 +7,193 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <style>
-body{background:#0b0b10;color:#f9fafb}
-.logoText{font-family:Orbitron;font-size:28px;letter-spacing:2px;
-background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;
-text-shadow:0 0 10px rgba(34,197,94,.5);text-align:center;width:100%}
-.card{background:#0f1218;border:1px solid #1f2430;border-radius:16px;overflow:hidden;transition:.3s}
-.card:hover{transform:translateY(-6px) scale(1.01);box-shadow:0 20px 40px rgba(0,0,0,.7)}
+body{background:#050510;color:white;font-family:system-ui}
+.logo{font-family:Orbitron;font-size:28px;
+background:linear-gradient(90deg,#00f0ff,#8b5cf6,#22c55e);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card{background:#0b0b18;border:1px solid #1f2933;border-radius:16px;overflow:hidden;transition:.3s}
+.card:hover{transform:translateY(-6px) scale(1.02);box-shadow:0 0 25px #7c3aed55}
 .price{color:#22c55e;font-weight:700}
-.glass{background:rgba(17,24,39,.85);backdrop-filter:blur(12px);border:1px solid #333;border-radius:16px}
-.upcoming-track{display:flex;gap:20px;width:max-content;animation:scrollLeft 30s linear infinite}
-.upcoming-wrapper:hover .upcoming-track{animation-play-state:paused}
-@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.hero{background:linear-gradient(to right, rgba(0,0,0,.8), rgba(0,0,0,.2)),
-url("https://wallpapers.com/images/hd/gaming-4k-background-3840-x-2160-5n2p0b3w2vshz2k7.jpg") center/cover}
+.btn{background:linear-gradient(90deg,#7c3aed,#22c55e);padding:10px;border-radius:10px;font-weight:700}
+.glass{background:rgba(20,20,40,.7);backdrop-filter:blur(10px);border:1px solid #333;border-radius:16px}
+.track{display:flex;gap:20px;width:max-content;animation:scroll 25s linear infinite}
+.wrapper:hover .track{animation-play-state:paused}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.hero{background:linear-gradient(to right,#000000cc,#00000022),
+url("https://wallpapers.com/images/hd/cyberpunk-gaming-4k-2.jpg") center/cover}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginBox" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-  <div class="bg-gray-900 p-6 rounded w-80">
-    <h2 class="text-xl font-bold mb-3">Login / Signup</h2>
-    <input id="email" placeholder="Email" class="w-full p-2 mb-2 bg-black border">
-    <input id="password" type="password" placeholder="Password" class="w-full p-2 mb-2 bg-black border">
-    <button onclick="login()" class="bg-purple-600 w-full py-2">Login</button>
-    <button onclick="signup()" class="bg-gray-700 w-full py-2 mt-2">Signup</button>
-  </div>
-</div>
-
 <!-- HEADER -->
-<header class="sticky top-0 bg-black/80 backdrop-blur px-4 py-3 border-b border-gray-800 z-40 flex justify-between items-center">
+<header class="sticky top-0 bg-black/80 backdrop-blur flex justify-between items-center px-4 py-3 border-b border-gray-800 z-50">
   <div></div>
-  <div class="logoText">BRAHMASTRA</div>
+  <div class="logo">BRAHMASTRA</div>
   <div class="flex gap-3">
-    <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
+    <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishCount">0</span></button>
     <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
   </div>
 </header>
 
-<!-- USER AREA -->
-<div id="userArea" class="hidden">
-
-<section class="hero h-[55vh] flex flex-col justify-center px-6">
-  <h1 class="text-4xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
-  <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
-  <button onclick="productsDiv.scrollIntoView({behavior:'smooth'})"
-    class="bg-purple-600 px-5 py-3 rounded font-bold w-fit">Shop Now</button>
+<!-- HERO -->
+<section class="hero h-[60vh] flex flex-col justify-center px-6">
+  <h1 class="text-4xl md:text-5xl font-bold mb-3">India’s Ultimate Gaming Store</h1>
+  <p class="text-gray-300 mb-4 max-w-lg">Instant delivery of PC & Console Games</p>
+  <button onclick="products.scrollIntoView({behavior:'smooth'})" class="btn w-fit">Shop Now</button>
 </section>
 
+<!-- UPCOMING -->
 <section class="p-5">
-  <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
-  <div class="upcoming-wrapper overflow-hidden glass">
-    <div id="upcomingTrack" class="upcoming-track p-4"></div>
-  </div>
-</section>
-
-<section class="p-4 bg-black/60 border-y border-gray-800">
-  <input id="search" placeholder="Search games..."
-    class="w-full p-3 bg-black border border-gray-700 rounded">
-</section>
-
-<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 pb-24"></main>
+<h2 class="text-yellow-400 text-xl font-bold mb-3">⏳ Upcoming Games</h2>
+<div class="wrapper overflow-hidden glass">
+<div id="upcoming" class="track p-4"></div>
 </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="flex gap-3 px-4 overflow-x-auto pb-2">
+  <button onclick="setCat('All')" class="btn">All</button>
+  <button onclick="setCat('Action')" class="btn">Action</button>
+  <button onclick="setCat('RPG')" class="btn">RPG</button>
+  <button onclick="setCat('Racing')" class="btn">Racing</button>
+  <button onclick="setCat('Shooter')" class="btn">Shooter</button>
+</section>
+
+<!-- SEARCH -->
+<section class="p-4">
+<input id="search" oninput="render()" placeholder="Search games..."
+class="w-full p-3 bg-black border border-gray-700 rounded">
+</section>
+
+<!-- PRODUCTS -->
+<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 pb-28"></main>
 
 <!-- CART -->
 <aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
-  <h3 class="font-bold mb-2">Your Cart</h3>
-  <div id="cartItems" class="text-sm space-y-2"></div>
-  <p class="font-bold mt-3">Total: ₹<span id="total">0</span></p>
-  <button onclick="checkout()" class="bg-green-600 w-full py-3 mt-3 rounded font-bold">Checkout via WhatsApp</button>
+<h3 class="font-bold mb-2">Cart</h3>
+<div id="cartItems" class="space-y-2 text-sm"></div>
+<p class="font-bold mt-3">Total: ₹<span id="total">0</span></p>
+<button onclick="checkout()" class="btn w-full mt-3">Checkout WhatsApp</button>
 </aside>
 
 <!-- WISHLIST -->
-<aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
-  <h3 class="font-bold mb-2">Wishlist</h3>
-  <div id="wishlistItems" class="text-sm space-y-2"></div>
+<aside id="wishBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
+<h3 class="font-bold mb-2">Wishlist</h3>
+<div id="wishItems" class="space-y-2 text-sm"></div>
 </aside>
 
 <!-- MODAL -->
 <div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4" onclick="closeModal()">
-  <div class="bg-gray-900 p-4 rounded-xl max-w-lg w-full" onclick="event.stopPropagation()">
-    <h2 id="mTitle" class="text-2xl font-bold"></h2>
-    <iframe id="mVideo" class="w-full h-60 my-3" allowfullscreen></iframe>
-    <p id="mPrice" class="price text-xl"></p>
-    <button id="mAdd" class="bg-purple-600 w-full py-3 mt-2 rounded font-bold">Add to Cart</button>
-    <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded font-bold">Buy Now</button>
-    <button id="mWish" class="bg-pink-600 w-full py-2 mt-2 rounded">Wishlist</button>
-  </div>
+<div class="bg-gray-900 p-4 rounded-xl max-w-lg w-full" onclick="event.stopPropagation()">
+<h2 id="mTitle" class="text-2xl font-bold"></h2>
+<iframe id="mVideo" class="w-full h-60 my-3"></iframe>
+<p id="mPrice" class="price text-xl"></p>
+<button id="mAdd" class="btn w-full mt-2">Add to Cart</button>
+<button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded">Buy Now</button>
 </div>
-
-<!-- ADMIN PANEL -->
-<div id="adminPanel" class="hidden p-4 bg-black border-t border-gray-800">
-  <h2 class="text-xl font-bold mb-2">Admin Panel</h2>
-  <input id="pName" placeholder="Game Name" class="p-2 bg-black border mb-2 w-full">
-  <input id="pPrice" placeholder="Price" type="number" class="p-2 bg-black border mb-2 w-full">
-  <input id="pImg" placeholder="Image URL" class="p-2 bg-black border mb-2 w-full">
-  <input id="pVideo" placeholder="YouTube Embed URL" class="p-2 bg-black border mb-2 w-full">
-  <button onclick="addProduct()" class="bg-green-600 px-4 py-2">Add Game</button>
 </div>
 
 <script>
-/* ---------- FIREBASE ---------- */
-const firebaseConfig={
- apiKey:"AIzaSyAW_N-mD7OHaTMwUZWWLNUHJgith3t4ToQ",
- authDomain:"brahmastra-app.firebaseapp.com",
- projectId:"brahmastra-app",
- storageBucket:"brahmastra-app.firebasestorage.app",
- messagingSenderId:"306469612802",
- appId:"1:306469612802:web:4dcd061510b13e4d0d661b"
-};
-firebase.initializeApp(firebaseConfig);
-const auth=firebase.auth();
-const db=firebase.firestore();
-
-/* ---------- DOM ---------- */
-const productsDiv=document.getElementById("products");
-const search=document.getElementById("search");
-const upcomingTrack=document.getElementById("upcomingTrack");
-
-/* ---------- LOGIN ---------- */
-function login(){auth.signInWithEmailAndPassword(email.value,password.value).catch(e=>alert(e.message))}
-function signup(){
- auth.createUserWithEmailAndPassword(email.value,password.value).then(r=>{
-  db.collection("users").doc(r.user.uid).set({email:r.user.email,role:"user"})
- }).catch(e=>alert(e.message))
-}
-
-/* ---------- ROLE ---------- */
-auth.onAuthStateChanged(user=>{
- if(!user){
-  loginBox.style.display="flex";
-  userArea.classList.add("hidden");
-  adminPanel.classList.add("hidden");
-  return;
- }
- loginBox.style.display="none";
- db.collection("users").doc(user.uid).get().then(d=>{
-  if(!d.exists)return;
-  if(d.data().role==="admin"){
-    adminPanel.classList.remove("hidden");
-    userArea.classList.add("hidden");
-  }else{
-    adminPanel.classList.add("hidden");
-    userArea.classList.remove("hidden");
-  }
- })
-});
-
-/* ---------- UPCOMING ---------- */
-const upcomingGames=[
-{title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
-{title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
-{title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
-{title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
-];
-function renderUpcoming(){
- const html=upcomingGames.map(g=>`
-  <div class="glass p-4 w-[320px] shrink-0">
-   <img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
-   <p class="font-semibold">${g.title}</p>
-  </div>`).join("");
- upcomingTrack.innerHTML=html+html;
-}
-renderUpcoming();
-
-/* ---------- PRODUCTS ---------- */
-let products=[],cart=[],wishlist=[],selected=null;
-db.collection("products").onSnapshot(s=>{
- products=s.docs.map(d=>({id:d.id,...d.data()}));
- render();
-});
-
-/* ---------- ADMIN ADD ---------- */
-function addProduct(){
- db.collection("products").add({
-  title:pName.value,
-  price:+pPrice.value,
-  img:pImg.value,
-  video:pVideo.value,
-  time:Date.now()
+/* DATA */
+const allProducts=[];
+const cats=["Action","RPG","Racing","Shooter"];
+for(let i=1;i<=30;i++){
+ allProducts.push({
+  id:i,title:"Game "+i,price:600+i*50,
+  cat:cats[i%4],
+  img:"https://source.unsplash.com/600x800/?video-game&sig="+i,
+  video:"https://www.youtube.com/embed/K0u_kAWLJOA"
  });
- pName.value=pPrice.value=pImg.value=pVideo.value="";
 }
 
-/* ---------- STORE ---------- */
+const upcomingGames=[
+ {t:"GTA VI",i:"https://wallpapers.com/images/hd/gta-6-logo-fan-art.jpg"},
+ {t:"Witcher 4",i:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
+ {t:"Far Cry 7",i:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
+ {t:"AC Hexe",i:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
+];
+
+let cat="All",cart=[],wish=[],selected=null;
+
+/* UPCOMING */
+upcoming.innerHTML=upcomingGames.map(g=>`
+<div class="glass w-[300px] p-4 shrink-0">
+<img src="${g.i}" class="h-52 w-full object-cover rounded mb-2">
+<p class="font-semibold">${g.t}</p></div>`).join("")+
+upcomingGames.map(g=>`
+<div class="glass w-[300px] p-4 shrink-0">
+<img src="${g.i}" class="h-52 w-full object-cover rounded mb-2">
+<p class="font-semibold">${g.t}</p></div>`).join("");
+
+/* RENDER */
 function render(){
  const q=search.value.toLowerCase();
- const list=products.filter(p=>p.title.toLowerCase().includes(q));
- if(!list.length){
-  productsDiv.innerHTML="<p class='col-span-full text-center text-gray-500'>No Products</p>";
-  return;
- }
- productsDiv.innerHTML=list.map(p=>`
-  <div class="card" onclick="openModal('${p.id}')">
-   <img src="${p.img}" class="h-56 w-full object-cover">
-   <div class="p-3">
-    <div class="font-semibold mb-1">${p.title}</div>
-    <div class="price mb-2">₹${p.price}</div>
-    <button class="bg-purple-600 w-full py-2 rounded font-semibold"
-     onclick="event.stopPropagation();addCart('${p.id}')">Add to Cart</button>
-   </div>
-  </div>`).join("");
+ let f=allProducts.filter(p=>p.title.toLowerCase().includes(q));
+ if(cat!="All")f=f.filter(p=>p.cat==cat);
+ products.innerHTML=f.map(p=>`
+ <div class="card" onclick="openModal(${p.id})">
+ <img src="${p.img}" class="h-56 w-full object-cover">
+ <div class="p-3">
+ <div class="font-semibold">${p.title}</div>
+ <div class="text-xs text-gray-400">${p.cat}</div>
+ <div class="price mb-2">₹${p.price}</div>
+ <button class="btn w-full" onclick="event.stopPropagation();addCart(${p.id})">Add to Cart</button>
+ </div></div>`).join("");
 }
-search.addEventListener("input",render);
+render();
 
-/* ---------- MODAL ---------- */
+function setCat(c){cat=c;render();}
+
+/* MODAL */
 function openModal(id){
- selected=products.find(x=>x.id===id);
+ selected=allProducts.find(x=>x.id==id);
  mTitle.innerText=selected.title;
  mPrice.innerText="₹"+selected.price;
- mVideo.src=selected.video||"";
- mAdd.onclick=()=>addCart(selected.id);
+ mVideo.src=selected.video;
+ mAdd.onclick=()=>addCart(id);
  mBuy.onclick=()=>buyNow(selected);
- mWish.onclick=()=>toggleWishlistItem(selected.id);
  modal.classList.remove("hidden");
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-/* ---------- CART ---------- */
+/* CART */
 function addCart(id){
- const p=products.find(x=>x.id===id);
- const f=cart.find(x=>x.id===id);
- if(f)f.qty++; else cart.push({...p,qty:1});
- renderCart();
+ const p=allProducts.find(x=>x.id==id);
+ const f=cart.find(x=>x.id==id);
+ if(f)f.q++; else cart.push({...p,q:1});
+ drawCart();
 }
-function renderCart(){
- cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
+function drawCart(){
+ cartCount.innerText=cart.reduce((s,i)=>s+i.q,0);
  let t=0;
  cartItems.innerHTML=cart.map(i=>{
-  t+=i.price*i.qty;
-  return `<div class="flex justify-between"><span>${i.title} x${i.qty}</span><span>₹${i.price*i.qty}</span></div>`;
+  t+=i.price*i.q;
+  return `<div class="flex justify-between">
+  <span>${i.title} x${i.q}</span><span>₹${i.price*i.q}</span></div>`;
  }).join("");
  total.innerText=t;
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-/* ---------- WISHLIST ---------- */
-function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
-function toggleWishlistItem(id){
- const p=products.find(x=>x.id===id);
- if(wishlist.find(x=>x.id===id))wishlist=wishlist.filter(x=>x.id!==id);
- else wishlist.push(p);
- renderWishlist();
+/* WISHLIST */
+function toggleWishlist(){wishBox.classList.toggle("-translate-x-full");}
+function addWish(p){
+ if(!wish.find(x=>x.id==p.id))wish.push(p);
+ drawWish();
 }
-function renderWishlist(){
- wishlistCount.innerText=wishlist.length;
- wishlistItems.innerHTML=wishlist.map(w=>`
-  <div class="flex justify-between">
-   <span>${w.title}</span>
-   <button onclick="addCart('${w.id}')">Add</button>
-  </div>`).join("");
+function drawWish(){
+ wishCount.innerText=wish.length;
+ wishItems.innerHTML=wish.map(w=>`
+ <div class="flex justify-between">
+ <span>${w.title}</span>
+ <button onclick="addCart(${w.id})">Add</button></div>`).join("");
 }
 
-/* ---------- CHECKOUT ---------- */
+/* BUY */
 function checkout(){
- if(!cart.length)return;
  let msg="Order:\n",t=0;
- cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.q}\n`;t+=i.price*i.q});
  msg+=`Total ₹${t}`;
  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
 }
@@ -280,4 +203,3 @@ function buyNow(p){
 </script>
 </body>
 </html>
-
