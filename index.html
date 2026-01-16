@@ -6,32 +6,33 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-
 <style>
 body{background:#0b0b10;color:#f9fafb}
-.logoText{
- font-family:'Orbitron',sans-serif;
- font-size:26px;letter-spacing:2px;
- background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
- -webkit-background-clip:text;-webkit-text-fill-color:transparent;
- text-shadow:0 0 10px rgba(34,197,94,.6)
-}
-.card{background:#0f1218;border:1px solid #1f2430;border-radius:12px;overflow:hidden;transition:.3s}
-.card:hover{transform:translateY(-4px);box-shadow:0 15px 35px rgba(0,0,0,.6)}
+.logoText{font-family:'Orbitron',sans-serif;font-size:28px;letter-spacing:2px;
+background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+text-shadow:0 0 12px rgba(34,197,94,.6)}
+.card{background:#0f1218;border:1px solid #1f2430;border-radius:14px;overflow:hidden;transition:.3s}
+.card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.7)}
 .price{color:#22c55e;font-weight:700}
-.glass{background:rgba(17,24,39,.8);backdrop-filter:blur(10px);border:1px solid #374151;border-radius:12px}
+.glass{background:rgba(17,24,39,.85);backdrop-filter:blur(10px);border:1px solid #374151;border-radius:14px}
 
 /* UPCOMING AUTO SCROLL */
-.upcoming-track{display:flex;width:max-content;animation:scroll 25s linear infinite}
+.upcoming-track{display:flex;width:max-content;animation:scroll 28s linear infinite}
 @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.upcoming-box{width:260px}
+.upcoming-box img{height:180px}
+
+/* Featured */
+.featured-box{width:220px}
+.featured-box img{height:140px}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="flex justify-between items-center p-4 sticky top-0 bg-black/90 z-50 border-b border-gray-800">
   <div class="flex items-center gap-2">
-    <div class="w-8 h-8 rounded bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
+    <div class="w-9 h-9 rounded bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
     <div class="logoText">BRAHMASTRA</div>
   </div>
   <div class="flex gap-2">
@@ -40,11 +41,11 @@ body{background:#0b0b10;color:#f9fafb}
   </div>
 </header>
 
-<!-- UPCOMING (AUTO SCROLL) -->
+<!-- UPCOMING -->
 <section class="p-4">
 <h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
 <div class="overflow-hidden glass">
-  <div id="upcoming" class="upcoming-track p-3 gap-4"></div>
+  <div id="upcoming" class="upcoming-track p-4 gap-4"></div>
 </div>
 </section>
 
@@ -61,7 +62,7 @@ body{background:#0b0b10;color:#f9fafb}
 </select>
 </section>
 
-<!-- FEATURED (NO AUTO SCROLL) -->
+<!-- FEATURED -->
 <section class="p-4">
 <h2 class="text-purple-400 font-semibold mb-2">🔥 Featured</h2>
 <div id="featured" class="flex gap-4 overflow-x-auto"></div>
@@ -104,37 +105,41 @@ body{background:#0b0b10;color:#f9fafb}
 <script>
 /* PRODUCTS */
 const products=[];
-for(let i=1;i<=50;i++){
+for(let i=1;i<=60;i++){
  products.push({
-  id:i,title:"Game "+i,price:500+i*40,
+  id:i,
+  title:"Game "+i,
+  price:500+i*35,
   video:"https://www.youtube.com/embed/K0u_kAWLJOA",
-  img:"https://picsum.photos/400?random="+i
+  img:"https://picsum.photos/500?random="+i
  });
 }
-const featuredGames=products.slice(0,10);
+const featuredGames=products.slice(0,12);
 const upcomingGames=[
  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
- {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"}
+ {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
+ {title:"Assassin Creed Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"},
+ {title:"Call of Duty 2025",img:"https://wallpapers.com/images/hd/call-of-duty-modern-warfare-cover.jpg"}
 ];
 
 let cart=[],wishlist=[],recent=[],selected=null;
 
-/* UPCOMING AUTO */
+/* UPCOMING */
 const up=document.getElementById("upcoming");
 const upHTML=upcomingGames.map(g=>`
-<div class="glass w-40 p-2">
-<img src="${g.img}" class="h-24 w-full object-cover rounded">
-<p class="text-xs mt-1">${g.title}</p>
+<div class="glass upcoming-box p-3">
+<img src="${g.img}" class="w-full object-cover rounded mb-1">
+<p class="text-sm">${g.title}</p>
 </div>`).join("");
 up.innerHTML=upHTML+upHTML;
 
 /* FEATURED */
 const feat=document.getElementById("featured");
 feat.innerHTML=featuredGames.map(g=>`
-<div class="glass w-40 p-2 cursor-pointer" onclick="openModal(${g.id})">
-<img src="${g.img}" class="h-24 w-full object-cover rounded">
-<p class="text-sm mt-1">${g.title}</p>
+<div class="glass featured-box p-2 cursor-pointer" onclick="openModal(${g.id})">
+<img src="${g.img}" class="w-full object-cover rounded mb-1">
+<p class="text-sm">${g.title}</p>
 <p class="price">₹${g.price}</p>
 </div>`).join("");
 
@@ -228,3 +233,4 @@ function buyNow(p){
 </script>
 </body>
 </html>
+
