@@ -15,8 +15,8 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 .card:hover{transform:translateY(-4px);box-shadow:0 15px 30px #000}
 .price{color:#22c55e;font-weight:700}
 .glass{background:rgba(17,24,39,.85);backdrop-filter:blur(10px);border:1px solid #333;border-radius:12px}
-.upcoming-track{display:flex;width:max-content;animation:scroll 30s linear infinite}
-@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.upcoming-track{display:flex;gap:16px;width:max-content;animation:scrollLeft 25s linear infinite}
+@keyframes scrollLeft{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 </style>
 </head>
 <body>
@@ -30,11 +30,11 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
   </div>
 </header>
 
-<!-- UPCOMING AUTO SCROLL -->
+<!-- UPCOMING -->
 <section class="p-4">
   <h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
   <div class="overflow-hidden glass">
-    <div id="upcomingTrack" class="upcoming-track gap-4 p-4"></div>
+    <div id="upcomingTrack" class="upcoming-track p-4"></div>
   </div>
 </section>
 
@@ -49,7 +49,7 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 <!-- CART -->
 <aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
   <h3 class="font-bold mb-2">Cart</h3>
-  <div id="cartItems" class="flex-1 text-sm"></div>
+  <div id="cartItems" class="text-sm space-y-1"></div>
   <p class="font-bold mt-2">Total: ₹<span id="total">0</span></p>
   <button onclick="checkout()" class="bg-green-600 w-full py-2 mt-2 rounded">Checkout WhatsApp</button>
 </aside>
@@ -57,7 +57,7 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 <!-- WISHLIST -->
 <aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
   <h3 class="font-bold mb-2">Wishlist</h3>
-  <div id="wishlistItems"></div>
+  <div id="wishlistItems" class="text-sm space-y-1"></div>
 </aside>
 
 <!-- MODAL -->
@@ -73,6 +73,7 @@ background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
 </div>
 
 <script>
+// PRODUCTS
 const products=[];
 for(let i=1;i<=40;i++){
  products.push({
@@ -84,6 +85,7 @@ for(let i=1;i<=40;i++){
  });
 }
 
+// UPCOMING
 const upcomingGames=[
  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
@@ -97,16 +99,18 @@ let cart=[],wishlist=[],selected=null;
 const productsDiv=document.getElementById("products");
 const upcomingTrack=document.getElementById("upcomingTrack");
 
+// UPCOMING RENDER
 function renderUpcoming(){
  const html=upcomingGames.map(g=>`
   <div class="glass p-3 w-[280px] shrink-0">
     <img src="${g.img}" class="h-44 w-full object-cover rounded mb-2">
     <p class="font-semibold">${g.title}</p>
   </div>`).join("");
- upcomingTrack.innerHTML=html+html;
+ upcomingTrack.innerHTML=html+html; // duplicate for infinite loop
 }
 renderUpcoming();
 
+// PRODUCTS RENDER
 function render(){
  const q=document.getElementById("search").value.toLowerCase();
  const f=products.filter(p=>p.title.toLowerCase().includes(q));
@@ -123,6 +127,7 @@ function render(){
 }
 render();
 
+// MODAL
 function openModal(id){
  selected=products.find(x=>x.id===id);
  mTitle.innerText=selected.title;
@@ -135,6 +140,7 @@ function openModal(id){
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
+// CART
 function addCart(id){
  const p=products.find(x=>x.id===id);
  const f=cart.find(x=>x.id===id);
@@ -146,7 +152,7 @@ function renderCart(){
  let t=0;
  cartItems.innerHTML=cart.map(i=>{
   t+=i.price*i.qty;
-  return `<div class="flex justify-between text-sm">
+  return `<div class="flex justify-between">
    <span>${i.title} x${i.qty}</span>
    <span>₹${i.price*i.qty}</span></div>`;
  }).join("");
@@ -154,6 +160,7 @@ function renderCart(){
 }
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
+// WISHLIST
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
 function toggleWishlistItem(id){
  const p=products.find(x=>x.id===id);
@@ -165,12 +172,13 @@ function toggleWishlistItem(id){
 function renderWishlist(){
  wishlistCount.innerText=wishlist.length;
  wishlistItems.innerHTML=wishlist.map(w=>`
-  <div class="flex justify-between text-sm">
+  <div class="flex justify-between">
     <span>${w.title}</span>
     <button onclick="addCart(${w.id})">Add</button>
   </div>`).join("");
 }
 
+// CHECKOUT
 function checkout(){
  if(!cart.length)return;
  let msg="Order:\n";let t=0;
@@ -184,5 +192,3 @@ function buyNow(p){
 </script>
 </body>
 </html>
-
-
