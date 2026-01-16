@@ -9,93 +9,102 @@
 
 <style>
 body{
-  background:radial-gradient(circle at top,#0a0a18,#03030a);
-  color:#e5e7eb;
+  background:#0b0b10;
+  color:#f9fafb;
+  font-family:system-ui;
+  overflow-x:hidden;
 }
-.logo{
+body::after{
+  content:"";
+  position:fixed; inset:0; pointer-events:none;
+  box-shadow:inset 0 0 120px rgba(124,58,237,.15);
+}
+.logoText{
   font-family:Orbitron;
-  font-size:26px;
+  font-size:30px;
   letter-spacing:3px;
-  background:linear-gradient(90deg,#00f0ff,#8b5cf6,#22c55e);
+  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  text-shadow:0 0 20px #7c3aed66;
+  text-shadow:0 0 15px #22c55e88,0 0 30px #3b82f666;
 }
 .card{
-  background:linear-gradient(180deg,#0b0b1a,#050510);
-  border:1px solid #1f2933;
-  border-radius:18px;
+  background:#0f1218;
+  border:1px solid #1f2430;
+  border-radius:16px;
   overflow:hidden;
-  transition:.35s;
-}
-.card:hover{
-  transform:translateY(-8px) scale(1.02);
-  box-shadow:0 0 40px #7c3aed55;
-}
-.price{color:#22c55e;font-weight:800;font-size:18px}
-.btn{
-  background:linear-gradient(90deg,#7c3aed,#22c55e);
-  border-radius:999px;
-  font-weight:800;
   transition:.3s;
 }
-.btn:hover{filter:brightness(1.2);transform:scale(1.05)}
+.card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 0 25px #7c3aed55,0 0 50px #22c55e33;
+}
+.price{
+  color:#22c55e;
+  font-weight:700;
+  text-shadow:0 0 8px #22c55e,0 0 15px #22c55e88;
+}
+.btn{
+  background:#7c3aed;
+  border-radius:10px;
+  box-shadow:0 0 15px #7c3aed66,inset 0 0 10px #22c55e33;
+}
+.btn:hover{
+  box-shadow:0 0 25px #7c3aed,0 0 50px #22c55e,inset 0 0 15px #22c55e66;
+}
 .glass{
-  background:rgba(10,10,30,.7);
+  background:rgba(17,24,39,.85);
   backdrop-filter:blur(12px);
-  border:1px solid #2a2a44;
-  border-radius:20px;
+  border:1px solid #333;
+  border-radius:16px;
 }
-.hero{
-  background:
-  linear-gradient(to right,#000000dd,#00000044),
-  url("https://wallpapers.com/images/hd/cyberpunk-gaming-4k-2.jpg") center/cover;
-}
-.track{
+.upcoming-track{
   display:flex;
+  gap:20px;
   width:max-content;
-  gap:28px;
-  animation:scroll 30s linear infinite;
+  animation:scrollLeft 25s linear infinite;
 }
-.wrapper:hover .track{animation-play-state:paused}
-@keyframes scroll{
+.upcoming-wrapper:hover .upcoming-track{
+  animation-play-state:paused;
+}
+@keyframes scrollLeft{
   from{transform:translateX(0)}
   to{transform:translateX(-50%)}
+}
+#modal > div{
+  box-shadow:0 0 30px #7c3aed88,0 0 60px #22c55e44;
+}
+#cartBox,#wishlistBox{
+  box-shadow:0 0 30px #7c3aed55,0 0 60px #22c55e33;
 }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
-<header class="relative sticky top-0 z-50 bg-black/80 backdrop-blur border-b border-gray-800 flex justify-between items-center px-4 py-3">
-  <div></div>
-  <div class="logo absolute left-1/2 -translate-x-1/2">BRAHMASTRA</div>
-  <div class="flex gap-3">
-    <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
-    <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+<header class="sticky top-0 bg-black/80 backdrop-blur border-b border-gray-800 z-50">
+  <div class="flex justify-between items-center px-4 py-3">
+    <div class="w-12"></div>
+    <div class="logoText">BRAHMASTRA</div>
+    <div class="flex gap-2">
+      <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
+      <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+    </div>
   </div>
 </header>
-
-<!-- HERO -->
-<section class="hero h-[60vh] flex flex-col justify-center px-6">
-  <h1 class="text-4xl md:text-5xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
-  <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
-  <button onclick="productsDiv.scrollIntoView({behavior:'smooth'})"
-    class="btn px-6 py-3 w-fit">Shop Now</button>
-</section>
 
 <!-- UPCOMING -->
 <section class="p-5">
   <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
-  <div class="wrapper overflow-hidden glass">
-    <div id="upcomingTrack" class="track p-4"></div>
+  <div class="upcoming-wrapper overflow-hidden glass">
+    <div id="upcomingTrack" class="upcoming-track p-4"></div>
   </div>
 </section>
 
 <!-- SEARCH -->
 <section class="p-4 bg-black/60 border-y border-gray-800">
   <input id="search" oninput="render()" placeholder="Search games..."
-    class="w-full p-3 bg-black border border-gray-700 rounded-full">
+    class="w-full p-3 bg-black border border-gray-700 rounded">
 </section>
 
 <!-- PRODUCTS -->
@@ -104,15 +113,15 @@ body{
 <!-- CART -->
 <aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
   <h3 class="font-bold mb-2">Your Cart</h3>
-  <div id="cartItems" class="space-y-2 text-sm"></div>
+  <div id="cartItems" class="text-sm space-y-2"></div>
   <p class="font-bold mt-3">Total: ₹<span id="total">0</span></p>
-  <button onclick="checkout()" class="btn w-full py-3 mt-3">Checkout via WhatsApp</button>
+  <button onclick="checkout()" class="btn w-full py-3 mt-3 font-bold">Checkout via WhatsApp</button>
 </aside>
 
 <!-- WISHLIST -->
 <aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
   <h3 class="font-bold mb-2">Wishlist</h3>
-  <div id="wishlistItems" class="space-y-2 text-sm"></div>
+  <div id="wishlistItems" class="text-sm space-y-2"></div>
 </aside>
 
 <!-- MODAL -->
@@ -121,26 +130,26 @@ body{
     <h2 id="mTitle" class="text-2xl font-bold"></h2>
     <iframe id="mVideo" class="w-full h-60 my-3" allowfullscreen></iframe>
     <p id="mPrice" class="price text-xl"></p>
-    <button id="mAdd" class="btn w-full py-3 mt-2">Add to Cart</button>
+    <button id="mAdd" class="btn w-full py-3 mt-2 font-bold">Add to Cart</button>
     <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded font-bold">Buy Now</button>
     <button id="mWish" class="bg-pink-600 w-full py-2 mt-2 rounded">Wishlist</button>
   </div>
 </div>
 
 <script>
-/* PRODUCTS */
+// PRODUCTS
 const products=[];
 for(let i=1;i<=50;i++){
-  products.push({
-    id:i,
-    title:"Game "+i,
-    price:500+i*40,
-    video:"https://www.youtube.com/embed/K0u_kAWLJOA",
-    img:"https://source.unsplash.com/600x800/?video-game&sig="+i
-  });
+ products.push({
+  id:i,
+  title:"Game "+i,
+  price:600+i*35,
+  video:"https://www.youtube.com/embed/K0u_kAWLJOA",
+  img:"https://source.unsplash.com/600x800/?video-game,game&sig="+i
+ });
 }
 
-/* UPCOMING */
+// UPCOMING
 const upcomingGames=[
  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
@@ -150,103 +159,100 @@ const upcomingGames=[
 
 let cart=[],wishlist=[],selected=null;
 const productsDiv=document.getElementById("products");
+const upcomingTrack=document.getElementById("upcomingTrack");
 
-/* UPCOMING RENDER */
+// UPCOMING
 function renderUpcoming(){
-  const html=upcomingGames.map(g=>`
-    <div class="glass w-[300px] shrink-0 p-3">
-      <img src="${g.img}" class="h-48 w-full object-cover rounded mb-2">
-      <p class="font-bold">${g.title}</p>
-    </div>`).join("");
-  upcomingTrack.innerHTML=html+html;
+ const html=upcomingGames.map(g=>`
+  <div class="glass p-4 w-[320px] shrink-0">
+    <img src="${g.img}" class="h-52 w-full object-cover rounded mb-2">
+    <p class="font-semibold">${g.title}</p>
+  </div>`).join("");
+ upcomingTrack.innerHTML=html+html;
 }
 renderUpcoming();
 
-/* STORE */
+// PRODUCTS
 function render(){
-  const q=search.value.toLowerCase();
-  productsDiv.innerHTML=products.filter(p=>p.title.toLowerCase().includes(q)).map(p=>`
-    <div class="card cursor-pointer" onclick="openModal(${p.id})">
-      <img src="${p.img}" class="h-56 w-full object-cover">
-      <div class="p-3">
-        <div class="font-bold mb-1">${p.title}</div>
-        <div class="price mb-2">₹${p.price}</div>
-        <button class="btn w-full py-2"
-          onclick="event.stopPropagation();addCart(${p.id})">Add to Cart</button>
-      </div>
-    </div>`).join("");
+ const q=document.getElementById("search").value.toLowerCase();
+ const f=products.filter(p=>p.title.toLowerCase().includes(q));
+ productsDiv.innerHTML=f.map(p=>`
+  <div class="card cursor-pointer" onclick="openModal(${p.id})">
+    <img src="${p.img}" class="h-56 w-full object-cover">
+    <div class="p-3">
+      <div class="font-semibold mb-1">${p.title}</div>
+      <div class="price mb-2">₹${p.price}</div>
+      <button class="btn w-full py-2 font-semibold"
+        onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
+    </div>
+  </div>`).join("");
 }
 render();
 
-/* MODAL */
+// MODAL
 function openModal(id){
-  selected=products.find(x=>x.id===id);
-  mTitle.innerText=selected.title;
-  mPrice.innerText="₹"+selected.price;
-  mVideo.src=selected.video;
-  mAdd.onclick=()=>addCart(selected.id);
-  mBuy.onclick=()=>buyNow(selected);
-  mWish.onclick=()=>toggleWishlistItem(selected.id);
-  modal.classList.remove("hidden");
+ selected=products.find(x=>x.id===id);
+ mTitle.innerText=selected.title;
+ mPrice.innerText="₹"+selected.price;
+ mVideo.src=selected.video;
+ mAdd.onclick=()=>addCart(selected.id);
+ mBuy.onclick=()=>buyNow(selected);
+ mWish.onclick=()=>toggleWishlistItem(selected.id);
+ modal.classList.remove("hidden");
 }
 function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-/* CART */
+// CART
 function addCart(id){
-  const p=products.find(x=>x.id===id);
-  const f=cart.find(x=>x.id===id);
-  if(f)f.qty++; else cart.push({...p,qty:1});
-  renderCart();
+ const p=products.find(x=>x.id===id);
+ const f=cart.find(x=>x.id===id);
+ if(f)f.qty++; else cart.push({...p,qty:1});
+ renderCart();
 }
 function renderCart(){
-  cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
-  let t=0;
-  cartItems.innerHTML=cart.map(i=>{
-    t+=i.price*i.qty;
-    return `<div class="flex gap-2 items-center bg-gray-900 p-2 rounded">
-      <img src="${i.img}" class="w-12 h-12 rounded">
-      <div class="flex-1">
-        <p class="font-bold">${i.title}</p>
-        <p class="text-xs">₹${i.price} x ${i.qty}</p>
-      </div>
-      <button onclick="i.qty--||removeItem(${i.id});renderCart()" class="px-2">-</button>
-      <button onclick="i.qty++;renderCart()" class="px-2">+</button>
-    </div>`;
-  }).join("");
-  total.innerText=t;
+ cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
+ let t=0;
+ cartItems.innerHTML=cart.map(i=>{
+  t+=i.price*i.qty;
+  return `<div class="flex justify-between">
+    <span>${i.title} x${i.qty}</span>
+    <span>₹${i.price*i.qty}</span></div>`;
+ }).join("");
+ total.innerText=t;
 }
-function removeItem(id){cart=cart.filter(x=>x.id!==id)}
 function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-/* WISHLIST */
+// WISHLIST
 function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
 function toggleWishlistItem(id){
-  const p=products.find(x=>x.id===id);
-  if(wishlist.find(x=>x.id===id)) wishlist=wishlist.filter(x=>x.id!==id);
-  else wishlist.push(p);
-  renderWishlist();
+ const p=products.find(x=>x.id===id);
+ if(wishlist.find(x=>x.id===id))
+  wishlist=wishlist.filter(x=>x.id!==id);
+ else wishlist.push(p);
+ renderWishlist();
 }
 function renderWishlist(){
-  wishlistCount.innerText=wishlist.length;
-  wishlistItems.innerHTML=wishlist.map(w=>`
-    <div class="flex justify-between bg-gray-900 p-2 rounded">
-      <span>${w.title}</span>
-      <button onclick="addCart(${w.id})">Add</button>
-    </div>`).join("");
+ wishlistCount.innerText=wishlist.length;
+ wishlistItems.innerHTML=wishlist.map(w=>`
+  <div class="flex justify-between">
+    <span>${w.title}</span>
+    <button onclick="addCart(${w.id})">Add</button>
+  </div>`).join("");
 }
 
-/* CHECKOUT */
+// CHECKOUT
 function checkout(){
-  if(!cart.length)return;
-  let msg="Order:\n",t=0;
-  cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
-  msg+=`Total ₹${t}`;
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
+ if(!cart.length)return;
+ let msg="Order:\n";let t=0;
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
+ msg+=`Total ₹${t}`;
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
 }
 function buyNow(p){
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
 }
 </script>
 </body>
 </html>
+
 
