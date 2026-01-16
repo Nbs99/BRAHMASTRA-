@@ -8,187 +8,133 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
 <style>
 body{background:#0b0b10;color:#f9fafb}
-.logoText{font-family:'Orbitron',sans-serif;font-size:28px;letter-spacing:2px;
+.logoText{font-family:Orbitron;font-size:28px;letter-spacing:2px;
 background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
--webkit-background-clip:text;-webkit-text-fill-color:transparent;
-text-shadow:0 0 12px rgba(34,197,94,.6)}
-.card{background:#0f1218;border:1px solid #1f2430;border-radius:14px;overflow:hidden;transition:.3s}
-.card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.7)}
+-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.card{background:#0f1218;border:1px solid #1f2430;border-radius:12px;overflow:hidden;transition:.25s}
+.card:hover{transform:translateY(-4px);box-shadow:0 15px 30px #000}
 .price{color:#22c55e;font-weight:700}
-.glass{background:rgba(17,24,39,.85);backdrop-filter:blur(10px);border:1px solid #374151;border-radius:14px}
-
-/* UPCOMING AUTO SCROLL */
-.upcoming-track{display:flex;width:max-content;animation:scroll 28s linear infinite}
+.glass{background:rgba(17,24,39,.85);backdrop-filter:blur(10px);border:1px solid #333;border-radius:12px}
+.upcoming-track{display:flex;width:max-content;animation:scroll 30s linear infinite}
 @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.upcoming-box{width:260px}
-.upcoming-box img{height:180px}
-
-/* Featured */
-.featured-box{width:220px}
-.featured-box img{height:140px}
 </style>
 </head>
 <body>
 
-<header class="flex justify-between items-center p-4 sticky top-0 bg-black/90 z-50 border-b border-gray-800">
-  <div class="flex items-center gap-2">
-    <div class="w-9 h-9 rounded bg-gradient-to-br from-green-500 via-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold">BG</div>
-    <div class="logoText">BRAHMASTRA</div>
-  </div>
+<!-- HEADER -->
+<header class="sticky top-0 bg-black/90 backdrop-blur flex justify-between items-center px-4 py-3 border-b border-gray-800 z-50">
+  <div class="logoText">BRAHMASTRA</div>
   <div class="flex gap-2">
-    <button onclick="toggleWishlist()" class="bg-gray-900 px-3 py-1 rounded">♡ <span id="wishCount">0</span></button>
-    <button onclick="toggleCart()" class="bg-gray-900 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+    <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
+    <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
   </div>
 </header>
 
-<!-- UPCOMING -->
+<!-- UPCOMING AUTO SCROLL -->
 <section class="p-4">
-<h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
-<div class="overflow-hidden glass">
-  <div id="upcoming" class="upcoming-track p-4 gap-4"></div>
-</div>
+  <h2 class="text-yellow-400 font-semibold mb-2">⏳ Upcoming Games</h2>
+  <div class="overflow-hidden glass">
+    <div id="upcomingTrack" class="upcoming-track gap-4 p-4"></div>
+  </div>
 </section>
 
 <!-- SEARCH -->
-<section class="p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
-<input id="search" placeholder="Search game..." class="p-2 bg-black border border-gray-700 rounded">
-<input id="minP" type="number" placeholder="Min ₹" class="p-2 bg-black border border-gray-700 rounded">
-<input id="maxP" type="number" placeholder="Max ₹" class="p-2 bg-black border border-gray-700 rounded">
-<select id="sortBy" class="p-2 bg-black border border-gray-700 rounded">
-<option value="">Sort</option>
-<option value="price-asc">Low → High</option>
-<option value="price-desc">High → Low</option>
-<option value="name-asc">Name A-Z</option>
-</select>
-</section>
-
-<!-- FEATURED -->
-<section class="p-4">
-<h2 class="text-purple-400 font-semibold mb-2">🔥 Featured</h2>
-<div id="featured" class="flex gap-4 overflow-x-auto"></div>
-</section>
-
-<!-- RECENT -->
-<section class="p-4">
-<h2 class="text-green-400 font-semibold mb-2">👀 Recently Viewed</h2>
-<div id="recentBox" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+<section class="p-3 bg-black/50 border-y border-gray-800">
+  <input id="search" placeholder="Search game..." class="w-full p-2 bg-black border border-gray-700 rounded" oninput="render()">
 </section>
 
 <!-- PRODUCTS -->
-<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-4 pb-20"></main>
+<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 p-3 pb-20"></main>
 
 <!-- CART -->
-<aside id="cartBox" class="fixed top-0 right-0 w-72 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition z-50">
-<h3 class="font-bold mb-2">Cart</h3>
-<div id="cartItems" class="space-y-2 text-sm"></div>
-<p class="mt-3 font-bold">Total: ₹<span id="total">0</span></p>
-<button onclick="checkout()" class="bg-green-600 w-full mt-2 py-2 rounded">Checkout</button>
+<aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
+  <h3 class="font-bold mb-2">Cart</h3>
+  <div id="cartItems" class="flex-1 text-sm"></div>
+  <p class="font-bold mt-2">Total: ₹<span id="total">0</span></p>
+  <button onclick="checkout()" class="bg-green-600 w-full py-2 mt-2 rounded">Checkout WhatsApp</button>
 </aside>
 
 <!-- WISHLIST -->
-<aside id="wishlistBox" class="fixed top-0 left-0 w-72 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition z-50">
-<h3 class="font-bold mb-2">Wishlist</h3>
-<div id="wishlistItems" class="space-y-2 text-sm"></div>
+<aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
+  <h3 class="font-bold mb-2">Wishlist</h3>
+  <div id="wishlistItems"></div>
 </aside>
 
 <!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-3" onclick="closeModal()">
-<div class="bg-gray-900 p-4 rounded-xl max-w-md w-full" onclick="event.stopPropagation()">
-<h2 id="mTitle" class="text-2xl font-bold"></h2>
-<iframe id="mVideo" class="w-full h-56 my-3" allowfullscreen></iframe>
-<p id="mPrice" class="price text-xl"></p>
-<button id="mAdd" class="bg-purple-600 w-full py-3 mt-3 rounded text-lg font-bold">Add to Cart</button>
-<button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded text-lg font-bold">Buy Now</button>
-</div>
+<div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-3" onclick="closeModal()">
+  <div class="bg-gray-900 p-4 rounded-xl max-w-md w-full" onclick="event.stopPropagation()">
+    <h2 id="mTitle" class="text-xl font-bold"></h2>
+    <iframe id="mVideo" class="w-full h-56 my-3" allowfullscreen></iframe>
+    <p id="mPrice" class="price text-lg"></p>
+    <button id="mAdd" class="bg-purple-600 w-full py-3 mt-2 rounded font-bold">Add to Cart</button>
+    <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded font-bold">Buy Now</button>
+    <button id="mWish" class="bg-pink-600 w-full py-2 mt-2 rounded">Wishlist</button>
+  </div>
 </div>
 
 <script>
-/* PRODUCTS */
 const products=[];
-for(let i=1;i<=60;i++){
+for(let i=1;i<=40;i++){
  products.push({
   id:i,
   title:"Game "+i,
-  price:500+i*35,
+  price:500+i*50,
   video:"https://www.youtube.com/embed/K0u_kAWLJOA",
-  img:"https://picsum.photos/500?random="+i
+  img:"https://picsum.photos/400?random="+i
  });
 }
-const featuredGames=products.slice(0,12);
+
 const upcomingGames=[
  {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
  {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
  {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
  {title:"Assassin Creed Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"},
- {title:"Call of Duty 2025",img:"https://wallpapers.com/images/hd/call-of-duty-modern-warfare-cover.jpg"}
+ {title:"COD 2025",img:"https://wallpapers.com/images/hd/call-of-duty-modern-warfare-cover.jpg"}
 ];
 
-let cart=[],wishlist=[],recent=[],selected=null;
+let cart=[],wishlist=[],selected=null;
 
-/* UPCOMING */
-const up=document.getElementById("upcoming");
-const upHTML=upcomingGames.map(g=>`
-<div class="glass upcoming-box p-3">
-<img src="${g.img}" class="w-full object-cover rounded mb-1">
-<p class="text-sm">${g.title}</p>
-</div>`).join("");
-up.innerHTML=upHTML+upHTML;
-
-/* FEATURED */
-const feat=document.getElementById("featured");
-feat.innerHTML=featuredGames.map(g=>`
-<div class="glass featured-box p-2 cursor-pointer" onclick="openModal(${g.id})">
-<img src="${g.img}" class="w-full object-cover rounded mb-1">
-<p class="text-sm">${g.title}</p>
-<p class="price">₹${g.price}</p>
-</div>`).join("");
-
-/* PRODUCTS */
 const productsDiv=document.getElementById("products");
+const upcomingTrack=document.getElementById("upcomingTrack");
+
+function renderUpcoming(){
+ const html=upcomingGames.map(g=>`
+  <div class="glass p-3 w-[280px] shrink-0">
+    <img src="${g.img}" class="h-44 w-full object-cover rounded mb-2">
+    <p class="font-semibold">${g.title}</p>
+  </div>`).join("");
+ upcomingTrack.innerHTML=html+html;
+}
+renderUpcoming();
+
 function render(){
- let f=[...products];
- const q=search.value.toLowerCase();
- if(q) f=f.filter(p=>p.title.toLowerCase().includes(q));
- if(minP.value) f=f.filter(p=>p.price>=minP.value);
- if(maxP.value) f=f.filter(p=>p.price<=maxP.value);
- if(sortBy.value==="price-asc") f.sort((a,b)=>a.price-b.price);
- if(sortBy.value==="price-desc") f.sort((a,b)=>b.price-a.price);
- if(sortBy.value==="name-asc") f.sort((a,b)=>a.title.localeCompare(b.title));
+ const q=document.getElementById("search").value.toLowerCase();
+ const f=products.filter(p=>p.title.toLowerCase().includes(q));
  productsDiv.innerHTML=f.map(p=>`
- <div class="card cursor-pointer" onclick="openModal(${p.id})">
- <img src="${p.img}" class="h-48 w-full object-cover">
- <div class="p-2">
- <div>${p.title}</div>
- <div class="price">₹${p.price}</div>
- <button class="bg-purple-600 w-full mt-1 py-1 rounded"
- onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
- </div></div>`).join("");
+  <div class="card cursor-pointer" onclick="openModal(${p.id})">
+    <img src="${p.img}" class="h-48 w-full object-cover">
+    <div class="p-2">
+      <div class="font-semibold text-sm">${p.title}</div>
+      <div class="price">₹${p.price}</div>
+      <button class="bg-purple-600 w-full mt-1 py-1 rounded"
+        onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
+    </div>
+  </div>`).join("");
 }
 render();
-search.oninput=minP.oninput=maxP.oninput=render;
-sortBy.onchange=render;
 
-/* MODAL */
 function openModal(id){
  selected=products.find(x=>x.id===id);
  mTitle.innerText=selected.title;
  mPrice.innerText="₹"+selected.price;
  mVideo.src=selected.video;
- mAdd.onclick=()=>addCart(id);
+ mAdd.onclick=()=>addCart(selected.id);
  mBuy.onclick=()=>buyNow(selected);
+ mWish.onclick=()=>toggleWishlistItem(selected.id);
  modal.classList.remove("hidden");
- saveRecent(selected);
 }
-function closeModal(){modal.classList.add("hidden");mVideo.src=""}
+function closeModal(){modal.classList.add("hidden");mVideo.src="";}
 
-/* RECENT */
-function saveRecent(p){
- recent=[p,...recent.filter(x=>x.id!==p.id)].slice(0,6);
- recentBox.innerHTML=recent.map(r=>`
- <img src="${r.img}" class="h-20 w-full object-cover rounded">`).join("");
-}
-
-/* CART */
 function addCart(id){
  const p=products.find(x=>x.id===id);
  const f=cart.find(x=>x.id===id);
@@ -199,38 +145,44 @@ function renderCart(){
  cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
  let t=0;
  cartItems.innerHTML=cart.map(i=>{
- const lt=i.price*i.qty; t+=lt;
- return `<div>${i.title} x${i.qty} = ₹${lt}</div>`;
+  t+=i.price*i.qty;
+  return `<div class="flex justify-between text-sm">
+   <span>${i.title} x${i.qty}</span>
+   <span>₹${i.price*i.qty}</span></div>`;
  }).join("");
  total.innerText=t;
 }
-function toggleCart(){cartBox.classList.toggle("translate-x-full")}
+function toggleCart(){cartBox.classList.toggle("translate-x-full");}
 
-/* WISHLIST */
-function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full")}
-function toggleWish(id){
- const f=wishlist.find(x=>x.id===id);
- if(f)wishlist=wishlist.filter(x=>x.id!==id);
- else wishlist.push(products.find(x=>x.id===id));
- renderWish();
+function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
+function toggleWishlistItem(id){
+ const p=products.find(x=>x.id===id);
+ if(wishlist.find(x=>x.id===id))
+  wishlist=wishlist.filter(x=>x.id!==id);
+ else wishlist.push(p);
+ renderWishlist();
 }
-function renderWish(){
- wishCount.innerText=wishlist.length;
- wishlistItems.innerHTML=wishlist.map(w=>`<div>${w.title} - ₹${w.price}</div>`).join("");
+function renderWishlist(){
+ wishlistCount.innerText=wishlist.length;
+ wishlistItems.innerHTML=wishlist.map(w=>`
+  <div class="flex justify-between text-sm">
+    <span>${w.title}</span>
+    <button onclick="addCart(${w.id})">Add</button>
+  </div>`).join("");
 }
 
-/* CHECKOUT */
 function checkout(){
  if(!cart.length)return;
  let msg="Order:\n";let t=0;
- cart.forEach((i,n)=>{const lt=i.price*i.qty; t+=lt; msg+=`${n+1}. ${i.title} x${i.qty} = ₹${lt}\n`;});
- msg+="Total ₹"+t;
+ cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
+ msg+=`Total ₹${t}`;
  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
 }
 function buyNow(p){
- window.open("https://wa.me/919313339081?text="+encodeURIComponent(`Buy ${p.title} for ₹${p.price}`));
+ window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
 }
 </script>
 </body>
 </html>
+
 
