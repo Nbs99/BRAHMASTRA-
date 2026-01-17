@@ -1,252 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Brahmastra Gaming Store</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-
-<style>
-body{
-  background:radial-gradient(circle at top,#0a0a18,#03030a);
-  color:#e5e7eb;
-}
-.logo{
-  font-family:Orbitron;
-  font-size:26px;
-  letter-spacing:3px;
-  background:linear-gradient(90deg,#00f0ff,#8b5cf6,#22c55e);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  text-shadow:0 0 20px #7c3aed66;
-}
-.card{
-  background:linear-gradient(180deg,#0b0b1a,#050510);
-  border:1px solid #1f2933;
-  border-radius:18px;
-  overflow:hidden;
-  transition:.35s;
-}
-.card:hover{
-  transform:translateY(-8px) scale(1.02);
-  box-shadow:0 0 40px #7c3aed55;
-}
-.price{color:#22c55e;font-weight:800;font-size:18px}
-.btn{
-  background:linear-gradient(90deg,#7c3aed,#22c55e);
-  border-radius:999px;
-  font-weight:800;
-  transition:.3s;
-}
-.btn:hover{filter:brightness(1.2);transform:scale(1.05)}
-.glass{
-  background:rgba(10,10,30,.7);
-  backdrop-filter:blur(12px);
-  border:1px solid #2a2a44;
-  border-radius:20px;
-}
-.hero{
-  background:
-  linear-gradient(to right,#000000dd,#00000044),
-  url("https://wallpapers.com/images/hd/cyberpunk-gaming-4k-2.jpg") center/cover;
-}
-.track{
-  display:flex;
-  width:max-content;
-  gap:28px;
-  animation:scroll 30s linear infinite;
-}
-.wrapper:hover .track{animation-play-state:paused}
-@keyframes scroll{
-  from{transform:translateX(0)}
-  to{transform:translateX(-50%)}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brahmastra - India's Ultimate Gaming Store</title>
+  <style>
+    /* Add CSS styles here */
+  </style>
 </head>
 <body>
+  <header class="bg-gray-800 border-b border-gray-800 flex justify-between items-center px-4 py-3">
+    <div></div>
+    <div class="logo absolute left-1/2 -translate-x-1/2">BRAHMASTRA</div>
+    <div class="flex gap-3">
+      <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
+      <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+    </div>
+  </header>
 
-<!-- HEADER -->
-<header class="relative sticky top-0 z-50 bg-black/80 backdrop-blur border-b border-gray-800 flex justify-between items-center px-4 py-3">
-  <div></div>
-  <div class="logo absolute left-1/2 -translate-x-1/2">BRAHMASTRA</div>
-  <div class="flex gap-3">
-    <button onclick="toggleWishlist()" class="bg-gray-800 px-3 py-1 rounded">♡ <span id="wishlistCount">0</span></button>
-    <button onclick="toggleCart()" class="bg-gray-800 px-3 py-1 rounded">🛒 <span id="cartCount">0</span></button>
+  <!-- HERO -->
+  <section class="hero h-[60vh] flex flex-col justify-center px-6">
+    <h1 class="text-4xl md:text-5xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
+    <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
+    <button onclick="productsDiv.scrollIntoView({behavior:'smooth'})"
+      class="btn px-6 py-3 w-fit">Shop Now</button>
+  </section>
+
+  <!-- UPCOMING -->
+  <section class="p-5">
+    <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
+    <div class="wrapper overflow-hidden glass">
+      <div id="upcomingTrack" class="track p-4"></div>
+    </div>
+  </section>
+
+  <!-- SEARCH -->
+  <section class="p-4 bg-black/60 border-y border-gray-800">
+    <input id="search" oninput="render()" placeholder="Search games..."
+      class="w-full p-3 bg-black border border-gray-700 rounded-full">
+  </section>
+
+  <!-- PRODUCTS -->
+  <main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 pb-24"></main>
+
+  <!-- CART -->
+  <aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
+    <h3 class="font-bold mb-2">Your Cart</h3>
+    <div id="cartItems" class="space-y-2 text-sm"></div>
+    <p class="font-bold mt-3">Total: ₹<span id="total">0</span></p>
+    <button onclick="checkout()" class="btn w-full py-3 mt-3">Checkout via WhatsApp</button>
+  </aside>
+
+  <!-- WISHLIST -->
+  <aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
+    <h3 class="font-bold mb-2">Wishlist</h3>
+    <div id="wishlistItems" class="space-y-2 text-sm"></div>
+  </aside>
+
+  <!-- MODAL -->
+  <div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4" onclick="closeModal()">
+    <div class="bg-gray-900 p-4 rounded-xl max-w-lg w-full" onclick="event.stopPropagation()">
+      <h2 id="mTitle" class="text-2xl font-bold"></h2>
+      <iframe id="mVideo" class="w-full h-60 my-3" allowfullscreen></iframe>
+      <p id="mPrice" class="price text-xl"></p>
+      <button id="mAdd" class="btn w-full py-2 mt-2"
+        onclick="event.stopPropagation();addCart(${selected.id})">Add to Cart</button>
+      <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded font-bold"
+        onclick="buyNow(${selected.id})">Buy Now</button>
+      <button id="mWish" class="bg-pink-600 w-full py-2 mt-2 rounded"
+        onclick="toggleWishlistItem(${selected.id})">Wishlist</button>
+    </div>
   </div>
-</header>
 
-<!-- HERO -->
-<section class="hero h-[60vh] flex flex-col justify-center px-6">
-  <h1 class="text-4xl md:text-5xl font-bold mb-2">India’s Ultimate Gaming Store</h1>
-  <p class="text-gray-300 mb-4 max-w-lg">Buy premium PC & console games instantly.</p>
-  <button onclick="productsDiv.scrollIntoView({behavior:'smooth'})"
-    class="btn px-6 py-3 w-fit">Shop Now</button>
-</section>
+  <script>
+    // Define variables and arrays here
+    let products = [],
+      wishlist = [];
 
-<!-- UPCOMING -->
-<section class="p-5">
-  <h2 class="text-yellow-400 text-xl font-semibold mb-3">⏳ Upcoming Games</h2>
-  <div class="wrapper overflow-hidden glass">
-    <div id="upcomingTrack" class="track p-4"></div>
-  </div>
-</section>
+    // Render upcoming games on the page
+    function renderUpcoming() {
+      const html = upcomingGames.map(g => `
+        <div class="glass w-[300px] shrink-0 p-3">
+          <img src="${g.img}" class="h-48 w-full object-cover rounded mb-2">
+          <p class="font-bold">${g.title}</p>
+        </div>`).join("");
+      upcomingTrack.innerHTML = html;
+    }
 
-<!-- SEARCH -->
-<section class="p-4 bg-black/60 border-y border-gray-800">
-  <input id="search" oninput="render()" placeholder="Search games..."
-    class="w-full p-3 bg-black border border-gray-700 rounded-full">
-</section>
+    // Render the shopping products on the page
+    function render() {
+      const q = search.value.toLowerCase();
+      productsDiv.innerHTML = products.filter(p => p.title.toLowerCase().includes(q)).map(p => `
+        <div class="card cursor-pointer" onclick="openModal(${p.id})">
+          <img src="${p.img}" class="h-56 w-full object-cover">
+          <div class="p-3">
+            <div class="font-bold mb-1">${p.title}</div>
+            <div class="price mb-2">₹${p.price}</div>
+            <button class="btn w-full py-2"
+              onclick="event.stopPropagation(); addCart(${p.id})">Add to Cart</button>
+          </div>
+        </div>`).join("");
+    }
 
-<!-- PRODUCTS -->
-<main id="products" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 pb-24"></main>
+    // Open the modal when a product is clicked
+    function openModal(id) {
+      const p = products.find(x => x.id === id);
+      selected = p;
+      mTitle.innerText = selected.title;
+      mPrice.innerText = "₹" + selected.price;
+      mVideo.src = selected.video;
+      mAdd.onclick = () => addCart(selected.id);
+      mBuy.onclick = () => buyNow(selected.id);
+      mWish.onclick = () => toggleWishlistItem(selected.id);
 
-<!-- CART -->
-<aside id="cartBox" class="fixed top-0 right-0 w-80 h-full bg-black border-l border-gray-800 p-4 translate-x-full transition">
-  <h3 class="font-bold mb-2">Your Cart</h3>
-  <div id="cartItems" class="space-y-2 text-sm"></div>
-  <p class="font-bold mt-3">Total: ₹<span id="total">0</span></p>
-  <button onclick="checkout()" class="btn w-full py-3 mt-3">Checkout via WhatsApp</button>
-</aside>
+      modal.classList.remove("hidden");
+    }
 
-<!-- WISHLIST -->
-<aside id="wishlistBox" class="fixed top-0 left-0 w-80 h-full bg-black border-r border-gray-800 p-4 -translate-x-full transition">
-  <h3 class="font-bold mb-2">Wishlist</h3>
-  <div id="wishlistItems" class="space-y-2 text-sm"></div>
-</aside>
+    // Close the modal
+    function closeModal() {
+      modal.classList.add("hidden");
+      mVideo.src = "";
+    }
 
-<!-- MODAL -->
-<div id="modal" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4" onclick="closeModal()">
-  <div class="bg-gray-900 p-4 rounded-xl max-w-lg w-full" onclick="event.stopPropagation()">
-    <h2 id="mTitle" class="text-2xl font-bold"></h2>
-    <iframe id="mVideo" class="w-full h-60 my-3" allowfullscreen></iframe>
-    <p id="mPrice" class="price text-xl"></p>
-    <button id="mAdd" class="btn w-full py-3 mt-2">Add to Cart</button>
-    <button id="mBuy" class="bg-green-600 w-full py-3 mt-2 rounded font-bold">Buy Now</button>
-    <button id="mWish" class="bg-pink-600 w-full py-2 mt-2 rounded">Wishlist</button>
-  </div>
-</div>
+    // Add a product to the cart
+    function addCart(id) {
+      const p = products.find(x => x.id === id);
+      if (cart.find(x => x.id === id)) {
+        cart.find(x => x.id === id).qty++;
+      } else {
+        cart.push(p);
+        p.qty = 1;
+      }
+      renderCart();
+    }
 
-<script>
-/* PRODUCTS */
-const products=[];
-for(let i=1;i<=50;i++){
-  products.push({
-    id:i,
-    title:"Game "+i,
-    price:500+i*40,
-    video:"https://www.youtube.com/embed/K0u_kAWLJOA",
-    img:"https://source.unsplash.com/600x800/?video-game&sig="+i
-  });
-}
+    // Render the shopping cart on the page
+    function renderCart() {
+      let t = 0;
 
-/* UPCOMING */
-const upcomingGames=[
- {title:"GTA VI",img:"https://wallpapers.com/images/hd/gta-6-logo-fan-art-yx0zq0g5n1jzj0rf.jpg"},
- {title:"Witcher 4",img:"https://wallpapers.com/images/hd/the-witcher-wild-hunt-cover.jpg"},
- {title:"Far Cry 7",img:"https://wallpapers.com/images/hd/far-cry-6-cover-art.jpg"},
- {title:"AC Hexe",img:"https://wallpapers.com/images/hd/assassins-creed-cover-art.jpg"}
-];
+      // Calculate total price and render the cart items
+      cartItems.innerHTML = cart.map(i => {
+        t += i.price * i.qty;
+        return `
+          <div class="flex gap-2 items-center bg-gray-900 p-2 rounded">
+            <img src="${i.img}" class="w-12 h-12 rounded">
+            <div class="flex-1">
+              <p class="font-bold">${i.title}</p>
+              <p class="text-xs">₹${i.price} x ${i.qty}</p>
+            </div>
+            <button onclick="i.qty-- || removeItem(${i.id}); renderCart()" class="px-2">-</button>
+            <button onclick="i.qty++ ; renderCart()" class="px-2">+</button>
+          </div>`;
+      }).join("");
+      total.innerText = t;
+    }
 
-let cart=[],wishlist=[],selected=null;
-const productsDiv=document.getElementById("products");
+    // Remove a product from the cart
+    function removeItem(id) {
+      cart = cart.filter(x => x.id !== id);
+    }
 
-/* UPCOMING RENDER */
-function renderUpcoming(){
-  const html=upcomingGames.map(g=>`
-    <div class="glass w-[300px] shrink-0 p-3">
-      <img src="${g.img}" class="h-48 w-full object-cover rounded mb-2">
-      <p class="font-bold">${g.title}</p>
-    </div>`).join("");
-  upcomingTrack.innerHTML=html+html;
-}
-renderUpcoming();
+    // Toggle the shopping cart visibility
+    function toggleCart() {
+      cartBox.classList.toggle("translate-x-full");
+    }
 
-/* STORE */
-function render(){
-  const q=search.value.toLowerCase();
-  productsDiv.innerHTML=products.filter(p=>p.title.toLowerCase().includes(q)).map(p=>`
-    <div class="card cursor-pointer" onclick="openModal(${p.id})">
-      <img src="${p.img}" class="h-56 w-full object-cover">
-      <div class="p-3">
-        <div class="font-bold mb-1">${p.title}</div>
-        <div class="price mb-2">₹${p.price}</div>
-        <button class="btn w-full py-2"
-          onclick="event.stopPropagation();addCart(${p.id})">Add to Cart</button>
-      </div>
-    </div>`).join("");
-}
-render();
+    // Add a product to the wishlist
+    function toggleWishlist() {
+      wishlistBox.classList.toggle("-translate-x-full");
+    }
+    
+    function toggleWishlistItem(id) {
+      const p = products.find(x => x.id === id);
+      if (wishlist.find(x => x.id === id)) {
+        wishlist.find(x => x.id === id).qty++;
+      } else {
+        wishlist.push(p);
+        p.qty = 1;
+      }
+      renderWishlist();
+    }
 
-/* MODAL */
-function openModal(id){
-  selected=products.find(x=>x.id===id);
-  mTitle.innerText=selected.title;
-  mPrice.innerText="₹"+selected.price;
-  mVideo.src=selected.video;
-  mAdd.onclick=()=>addCart(selected.id);
-  mBuy.onclick=()=>buyNow(selected);
-  mWish.onclick=()=>toggleWishlistItem(selected.id);
-  modal.classList.remove("hidden");
-}
-function closeModal(){modal.classList.add("hidden");mVideo.src="";}
+    // Render the wishlist on the page
+    function renderWishlist() {
+      wishlistItems.innerHTML = wishlist.map(w => `
+        <div class="flex justify-between bg-gray-900 p-2 rounded">
+          <span>${w.title}</span>
+          <button onclick="addCart(${w.id})">Add</button>
+        </div>`).join("");
+      wishlistCount.innerText = wishlist.length;
+    }
 
-/* CART */
-function addCart(id){
-  const p=products.find(x=>x.id===id);
-  const f=cart.find(x=>x.id===id);
-  if(f)f.qty++; else cart.push({...p,qty:1});
-  renderCart();
-}
-function renderCart(){
-  cartCount.innerText=cart.reduce((s,i)=>s+i.qty,0);
-  let t=0;
-  cartItems.innerHTML=cart.map(i=>{
-    t+=i.price*i.qty;
-    return `<div class="flex gap-2 items-center bg-gray-900 p-2 rounded">
-      <img src="${i.img}" class="w-12 h-12 rounded">
-      <div class="flex-1">
-        <p class="font-bold">${i.title}</p>
-        <p class="text-xs">₹${i.price} x ${i.qty}</p>
-      </div>
-      <button onclick="i.qty--||removeItem(${i.id});renderCart()" class="px-2">-</button>
-      <button onclick="i.qty++;renderCart()" class="px-2">+</button>
-    </div>`;
-  }).join("");
-  total.innerText=t;
-}
-function removeItem(id){cart=cart.filter(x=>x.id!==id)}
-function toggleCart(){cartBox.classList.toggle("translate-x-full");}
+    // Check out and place an order via WhatsApp
+    function checkout() {
+      if (!cart.length) return;
 
-/* WISHLIST */
-function toggleWishlist(){wishlistBox.classList.toggle("-translate-x-full");}
-function toggleWishlistItem(id){
-  const p=products.find(x=>x.id===id);
-  if(wishlist.find(x=>x.id===id)) wishlist=wishlist.filter(x=>x.id!==id);
-  else wishlist.push(p);
-  renderWishlist();
-}
-function renderWishlist(){
-  wishlistCount.innerText=wishlist.length;
-  wishlistItems.innerHTML=wishlist.map(w=>`
-    <div class="flex justify-between bg-gray-900 p-2 rounded">
-      <span>${w.title}</span>
-      <button onclick="addCart(${w.id})">Add</button>
-    </div>`).join("");
-}
+      let msg = "Order:\n";
+      let t = 0;
+      cart.forEach((i, n) => {
+        msg += `${n + 1}. ${i.title} x ${i.qty}\n`;
+        t += i.price * i.qty;
+      });
+      msg += `\nTotal: ₹${t}`;
 
-/* CHECKOUT */
-function checkout(){
-  if(!cart.length)return;
-  let msg="Order:\n",t=0;
-  cart.forEach((i,n)=>{msg+=`${n+1}. ${i.title} x${i.qty}\n`;t+=i.price*i.qty});
-  msg+=`Total ₹${t}`;
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent(msg));
-}
-function buyNow(p){
-  window.open("https://wa.me/919313339081?text="+encodeURIComponent("Buy "+p.title+" ₹"+p.price));
-}
-</script>
+      // Add your WhatsApp API key here and send the order message
+    }
+
+    // Buy a product now
+    function buyNow(id) {
+      const p = products.find(x => x.id === id);
+      alert(`You have bought ${p.title} for ₹${p.price}`); // Use an appropriate method to handle purchase confirmation
+    }
+
+    // Initialize the page and render all necessary elements
+    window.onload = () => {
+      render();
+      renderUpcoming();
+    };
+  </script>
 </body>
 </html>
-
